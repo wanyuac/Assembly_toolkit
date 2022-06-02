@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N QUAST
+#PBS -l select=1:ncpus=8:mem=10gb:ompthreads=8
+#PBS -l walltime=24:00:00
+#PBS -j oe
+# Parameter: wd (working directory), od (output directory)
+#
+# Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
+# Licensed under the GNU General Public License v3.0
+# Publication: 2 June 2022; latest update: 2 June 2022
+
+module load anaconda3/personal
+source activate qc
+cd $wd
+
+quast --output-dir $od --min-contig 1 --threads 8 --no-sv --no-read-stats --no-snps --no-icarus --silent *.fasta
