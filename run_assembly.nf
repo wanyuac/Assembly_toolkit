@@ -1,18 +1,17 @@
 #!/usr/bin/env nextflow
 
 /*
-Assemble Illumina short reads using Unicycler.
+Assemble Illumina short reads using Unicycler or SPAdes.
 
 [Use guide]
 To run this pipeline in a screen session:
-    nextflow -Djava.io.tmpdir=$PWD run unicycler.nf --fastq "./reads/*_{1,2}.fastq.gz" \
-                              --assemblyDir assembly --condaUnicycler "$HOME/anaconda3/envs/unicycler" \
-                              -c unicycler.config -profile pbs
+    nextflow -Djava.io.tmpdir=$PWD run run_assembly.nf --fastq "./reads/*_{1,2}.fastq.gz" --outdir assembly \
+    --conda_unicycler "unicycler0.5.0" -c unicycler.config -profile pbs
 
 [Declaration]
 Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public License v3.0
-Publication: 28 March 2020; latest update: 20 May 2022
+Publication: 16 June 2022; latest update: 16 June 2022
 */
 
 /*------------------------------------------------------------------------------
@@ -33,14 +32,15 @@ def mkdir(dir_path) {  // Creates a directory and returns a File object
 }
 
 outdir = mkdir(params.outdir)
+logdir = mkdir(params.outdir + "/log")
 
 /*------------------------------------------------------------------------------
                            P R O C E S S E S 
 ------------------------------------------------------------------------------*/
 process Unicycler {
-    publishDir "${outdir}", pattern: "assembly.fasta", mode: "copy", overwrite: true, saveAs: { filename -> "${genome}.fasta" }
+    publishDir "${outdir}", pattern: "assembly.fasta", mode: "copy", overwrite: true, saveAs: { filename -> "${genome}.fna" }
     publishDir "${outdir}", pattern: "assembly.gfa", mode: "copy", overwrite: true, saveAs: { filename -> "${genome}.gfa" }
-    publishDir "${outdir}", pattern: "unicycler.log", mode: "copy", overwrite: true, saveAs: { filename -> "${genome}.log" }
+    publishDir "${outdir}/log", pattern: "unicycler.log", mode: "copy", overwrite: true, saveAs: { filename -> "${genome}.log" }
     
     input:
     tuple val(genome), file(fastqs)
@@ -53,8 +53,31 @@ process Unicycler {
     script:    
     """
     module load anaconda3/personal
-    source activate unicycler0.5.0
+    source activate ${params.conda_unicycler}
     unicycler -1 ${fastqs[0]} -2 ${fastqs[1]} --mode normal --threads ${params.cpus} --keep 0 --out .
+    """
+}
+
+process SPAdes {
+    publishDir "${outdir}", pattern: "output/scaffolds.fasta", mode: "copy", overwrite: true, saveAs: { filename -> "${genome}__scaffolds.fna" }
+    publishDir "${outdir}", pattern: "output/assembly_graph_with_scaffolds.gfa", mode: "copy", overwrite: true, saveAs: { filename -> "${genome}__scaffolds.gfa" }
+    publishDir "${outdir}", pattern: "output/scaffolds.paths", mode: "copy", overwrite: true, saveAs: { filename -> "${genome}__scaffolds.paths" }
+    publishDir "${outdir}/log", pattern: "output/spades.log", mode: "copy", overwrite: true, saveAs: { filename -> "${genome}.log" }
+
+    input:
+    tuple val(genome), file(fastqs)
+
+    output:
+    file("output/scaffolds.fasta")
+    file("output/assembly_graph_with_scaffolds.gfa")
+    file("output/scaffolds.paths")
+    file("output/spades.log")
+    
+    script:    
+    """
+    module load anaconda3/personal
+    source activate ${params.conda_spades}
+    spades.py -1 ${fastqs[0]} -2 ${fastqs[1]} -o output --phred-offset 33 --${params.spades_mode} --threads ${params.cpus} -k '${params.spades_kmers}'
     """
 }
 
@@ -63,7 +86,13 @@ process Unicycler {
 ------------------------------------------------------------------------------*/
 workflow {
     readsets = Channel.fromFilePairs(params.fastq)
-    Unicycler(readsets)
+    if (params.assembler == "unicycler") {
+        println "Use Unicycler to assemble genomes"
+        Unicycler(readsets)
+    } else {
+        println "Use SPAdes to assemble genomes"
+        SPAdes(readsets)
+    }
 }
 
 /* References
