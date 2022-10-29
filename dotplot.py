@@ -8,7 +8,7 @@ Dependencies: Python v3, BioPython, PIL (pip install Pillow)
 
 Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Creation: 28 September 2022; the latest update: 24 October 2022
+Creation: 28 September 2022; the latest update: 29 October 2022
 
 Appendix: Copyright information of Ryan Wick's dotplot.py
 'Copyright 2020 Ryan Wick (rrwick@gmail.com)
@@ -78,6 +78,7 @@ def main():
                    "max_font_size" : max(1, int(round(MAX_FONT_SIZE * args.pixels)))}
 
     """ Process input sequences and create dotplots """
+    log('\t'.join(['Sample', 'Sequence', 'Length_bp']))  # Print the header line in the log file
     seqs = SeqIO.to_dict(SeqIO.parse(args.input, "fasta"))
     for i, s in seqs.items():
         draw_dotplot(i, s.seq, args, image_sizes)  # One dot plot per sequence (contig)
@@ -95,7 +96,7 @@ def draw_dotplot(seq_id, seq, args, image_sizes):
     # Now that we know the values for min_font_size and max_text_height, we start over, this time
     # limiting the font size to the minimum (so all text is the same size) and readjusting the
     # top-left gap (so it isn't bigger than necessary).
-    log(f'Drawing a dot plot for sequence {seq_id}')
+    log('\t'.join([args.sample, seq_id, str(len(seq))]))
     top_left_gap = max_text_height + image_sizes["border_gap"]
     start_position, end_position, bp_per_pixel = get_positions(seq_id, seq, args.pixels, args.kmer, top_left_gap, image_sizes["border_gap"])
     image = Image.new('RGB', (args.pixels, args.pixels), BACKGROUND_COLOUR)  # Recreate the blank image
@@ -103,9 +104,9 @@ def draw_dotplot(seq_id, seq, args, image_sizes):
     draw_dots(image, seq_id, seq, start_position, bp_per_pixel, args.kmer)
     draw_sequence_box(image, seq_id, start_position, end_position, image_sizes["outline_width"], False)  # This step covers all dots that leak into the border line.
     if args.sample != None:
-        image.save(os.path.join(args.outdir, f'{args.sample}__{seq_id}.png'))
+        image.save(os.path.join(args.outdir, f'{args.sample}__{seq_id}__{args.kmer}-mer.png'))
     else:
-        image.save(os.path.join(args.outdir, seq_id + '.png'))
+        image.save(os.path.join(args.outdir, f'{seq_id}__{args.kmer}-mer.png'))
     return
 
 
@@ -272,7 +273,7 @@ def load_font(font_size):
 
 
 def log(message = '', end = '\n'):
-    print(message, file = sys.stderr, flush = True, end = end)
+    print(message, file = sys.stdout, flush = True, end = end)
 
 
 if __name__ == '__main__':
