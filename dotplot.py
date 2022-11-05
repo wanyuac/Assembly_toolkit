@@ -8,7 +8,7 @@ Dependencies: Python v3, BioPython, PIL (pip install Pillow)
 
 Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Creation: 28 September 2022; the latest update: 29 October 2022
+Creation: 28 September 2022; the latest update: 5 Nov 2022
 
 Appendix: Copyright information of Ryan Wick's dotplot.py
 'Copyright 2020 Ryan Wick (rrwick@gmail.com)
@@ -57,6 +57,7 @@ def parse_argument():
     parser.add_argument('-s', '--sample', dest = 'sample', type = str, required = False, default = None, help = "Sample name to be used as the prefix of output filenames (default: None)")
     parser.add_argument('-p', '--pixels', dest = 'pixels', type = int, required = False, default = 960, help = "Size of output figures (default: 960 pixels)")
     parser.add_argument('-k', '--kmer', dest = 'kmer', type = int, required = False, default = 32, help = "K-mer size for creating dot plots (default: 32 bp)")  # Based on the default k-mer size in https://github.com/rrwick/Trycycler/blob/main/trycycler/__main__.py
+    parser.add_argument('-n', '--no_plot', dest = 'no_plot', action = 'store_true', help = "A flag for producing only a summary of contig lengths without dot plots (default: off)")
     return parser.parse_args()
 
 
@@ -81,22 +82,23 @@ def main():
     log('\t'.join(['Sample', 'Sequence', 'Length_bp']))  # Print the header line in the log file
     seqs = SeqIO.to_dict(SeqIO.parse(args.input, "fasta"))
     for i, s in seqs.items():
-        draw_dotplot(i, s.seq, args, image_sizes)  # One dot plot per sequence (contig)
+        log('\t'.join([args.sample, i, str(len(s.seq))]))
+        if not args.no_plot:
+            draw_dotplot(i, s.seq, args, image_sizes)  # One dot plot per sequence (contig)
     return
 
 
 def draw_dotplot(seq_id, seq, args, image_sizes):
+    """ Making a dot plot for a sequence (contig) """
+
     # We create an initial image to test the label sizes.
-    start_position, end_position, bp_per_pixel = get_positions(seq_id, seq, args.pixels, args.kmer,\
-                                                               image_sizes["top_left_gap"], image_sizes["border_gap"])
+    start_position, end_position, bp_per_pixel = get_positions(seq_id, seq, args.pixels, args.kmer, image_sizes["top_left_gap"], image_sizes["border_gap"])
     image = Image.new('RGB', (args.pixels, args.pixels), BACKGROUND_COLOUR)  # Create a blank image
-    min_font_size, max_text_height = draw_labels(image, seq_id, start_position, end_position,\
-                                                 image_sizes["text_gap"], image_sizes["outline_width"], image_sizes["max_font_size"])
+    min_font_size, max_text_height = draw_labels(image, seq_id, start_position, end_position, image_sizes["text_gap"], image_sizes["outline_width"], image_sizes["max_font_size"])
 
     # Now that we know the values for min_font_size and max_text_height, we start over, this time
     # limiting the font size to the minimum (so all text is the same size) and readjusting the
     # top-left gap (so it isn't bigger than necessary).
-    log('\t'.join([args.sample, seq_id, str(len(seq))]))
     top_left_gap = max_text_height + image_sizes["border_gap"]
     start_position, end_position, bp_per_pixel = get_positions(seq_id, seq, args.pixels, args.kmer, top_left_gap, image_sizes["border_gap"])
     image = Image.new('RGB', (args.pixels, args.pixels), BACKGROUND_COLOUR)  # Recreate the blank image

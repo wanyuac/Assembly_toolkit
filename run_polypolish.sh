@@ -1,16 +1,19 @@
 #!/bin/bash
-# Example: ./run_polypolish.sh isolate1 $asm_medaka $illumina $asm_poli
+# run_polypolish.sh [isolate name] [input FASTA file] [directory of short reads] [output directory]
 # Prerequisites: python v3, BWA
 # Reference: https://github.com/rrwick/Polypolish/wiki/How-to-run-Polypolish
 # Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 4 Nov 2022
+# First version: 1 May 2022; latest update: 5 Nov 2022
 
 # 1. Preparation ###############
+# Read parameters
 i="$1"  # Isolate name
 fasta_in="$2"  # Input FASTA file (path and filename)
 reads_dir="$3"  # Directory of input Illumina reads
 outdir="$4"  # Output directory
+
+# Set up input and output paths
 if [ ! -d "$outdir" ]; then
 	mkdir $outdir
     mkdir ${outdir}/log
