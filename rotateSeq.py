@@ -16,7 +16,7 @@ on the list. Therefore, all circular sequences must be listed even if they will 
 
 Dependencies: Python 3, BioPython 1.78+.
 
-Copyright (C) 2021 Yu Wan <wanyuac@126.com>
+Copyright (C) 2021-2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
 Creation: 17 June 2021; the latest update: 5 Nov 2022
 """
