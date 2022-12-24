@@ -4,7 +4,7 @@
 # Reference: https://github.com/rrwick/Polypolish/wiki/How-to-run-Polypolish
 # Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 5 Nov 2022
+# First version: 1 May 2022; latest update: 24 December 2022
 
 # 1. Preparation ###############
 # Read parameters
@@ -38,4 +38,8 @@ bwa mem -a -t 4 $fasta_in $r2 > ${tm}/unfiltered_2.sam
 echo "Polishing assembly $fasta_in with Polypolish"
 ~/bin/polypolish-v0.5.0/polypolish $fasta_in ${tm}/filtered_1.sam ${tm}/filtered_2.sam 1>${outdir}/${i}_polypolish.fna 2>${outdir}/log/${i}_polypolish.log
 rm -rf $tm
+
+# 4. Removing '_polypolish' from sequence headers to preserve the original ones ###############
+sed -i 's/_polypolish//g' ${outdir}/${i}_polypolish.fna
+
 echo -e "Finished polishing the assembly of isolate ${i}\n"
