@@ -1,16 +1,16 @@
 #!/bin/bash
 # Run Flye assembler for long-read assemblies
-# run_flye.sh [input read file] [number of polishing rounds] [Filename extension of the input read file (fastq/fastq.gz/etc)] [possible genome size] [number of threads]
+# run_flye.sh [input read file] [Filename extension of the input read file (fastq/fastq.gz/etc)] [probable genome size] [number of polishing rounds] [number of threads]
 # Change the number of threads for your computer.
 # Copyright (C) 2022-2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 18 Dec 2022; latest update: 3 Jan 2023
+# First version: 18 Dec 2022; latest update: 10 Jan 2023
 
 # Read parameters ###############
 r="$1"  # Input read file (filename extensions: fastq, fastq.gz, etc)
-p="$2"  # Number of polishing rounds
-e="$3"  # Filename extension of the input read file (fastq/fastq.gz/etc)
-g="$4"  # Genome size (for instance, 5m)
+e="$2"  # Filename extension of the input read file (fastq/fastq.gz/etc)
+g="$3"  # Probable genome size (for instance, 5m)
+p="$4"  # Number of polishing rounds
 t="$5"  # Number of threads
 
 # Generate a genome assembly from long reads ###############
