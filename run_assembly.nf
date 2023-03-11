@@ -6,12 +6,12 @@ Assemble Illumina short reads using Unicycler or SPAdes.
 [Use guide]
 To run this pipeline in a screen session:
     nextflow -Djava.io.tmpdir=$PWD run run_assembly.nf --fastq "./reads/*_{1,2}.fastq.gz" --outdir assembly \
-    --conda_unicycler "unicycler0.5.0" -c unicycler.config -profile pbs
+    --conda_unicycler "unicycler0.5.0" -c run_assembly.config -profile pbs
 
 [Declaration]
 Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public License v3.0
-Publication: 16 June 2022; latest update: 16 June 2022
+Publication: 16 June 2022; latest update: 11 March 2023
 */
 
 /*------------------------------------------------------------------------------
