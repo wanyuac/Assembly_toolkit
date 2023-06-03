@@ -4,7 +4,7 @@
 # Change the number of threads for your computer.
 # Copyright (C) 2022-2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 18 Dec 2022; latest update: 10 Jan 2023
+# First version: 18 Dec 2022; latest update: 3 June 2023
 
 # Read parameters ###############
 r="$1"  # Input read file (filename extensions: fastq, fastq.gz, etc)
@@ -17,12 +17,12 @@ t="$5"  # Number of threads
 f=$(basename $r ".$e")
 pre="${f}_flye_p${p}"
 v=`flye --version`
-if [ -z "$t" ]; then
-t=1
-fi
+if [ -z "$t" ]; then t=1; fi
 echo "Assembling long reads $r using Flye v$v (polish: ${p}) with $t threads"
 mkdir ./tmp
-flye --nano-raw $r --threads $t --out-dir ./tmp --iterations $p --genome-size $g --scaffold  # --subassemblies is incompatible with --nano-raw or --nano-corr
+
+flye --nano-raw $r --threads $t --out-dir ./tmp --iterations $p --genome-size $g  # --subassemblies is incompatible with --nano-raw or --nano-corr
+
 mv ./tmp/assembly.fasta ${pre}.fasta
 mv ./tmp/assembly_graph.gfa ${pre}.gfa
 mv ./tmp/assembly_info.txt ${pre}.txt
