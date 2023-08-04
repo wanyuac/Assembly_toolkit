@@ -2,7 +2,7 @@
 # Run Flye, Raven, and Minipolish assembler to assemble subsets of Nanopore reads generated using command "trycycler subsample".
 # Copyright (C) 2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 27 July 2023; last update: 29 July 2023
+# First version: 27 July 2023; last update: 4 August 2023
 
 # Help information ###############
 display_usage() {
@@ -13,15 +13,20 @@ display_usage() {
     
     Preprequsites: please ensure flye, raven, minimap2, miniasm, minipolish, and any2fasta are accessible in
     your environment. These programs can be installed with Conda.
-    
+
     Parameters:
-      -d=*: directory of input FASTQ files (*.fastq, mandatory)
+      -d=*: directory of input FASTQ files (*.fastq, mandatory, and do not include the final forward slash)
       -p=*: number of assembly-polishing rounds (default: 2, optional)
       -t=*: number of threads (default: 1, optional)
       -l=*: expected genome length (e.g., 5m) for Flye (mandatory)
       -h: a flag to instruct Flye to treat input reads as of high quality (error rate <5%, optional)
       -k=*: length of minimisers used to find overlaps by Raven (default: 15, optional)
       -w=*: length of sliding window from which minimisers are sampled by Raven (default: 5, optional)
+    
+    Example useage:
+      /usr/local/bin/Assembly_toolkit/trycycler_assemble_read_subsets.sh -d=\"\$HOME/reads/subsets\" -p=2 -t=8 -l=2.5m -h -k=15 -w=5
+
+    Output: directory 'assemblies', which stores assemblies in GFA and FASTA formats, will be created under the current working directory.
     "
 }
 
