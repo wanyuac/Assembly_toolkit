@@ -46,10 +46,10 @@ run_flye() {
     
     if [ "$h" == true ]; then
         echo "[$(date)] Assembling high-quality (error rate <5%) ONT reads $r using Flye (polish: ${p}) with $t threads (temporary output directory: $tmp_dir)"
-        flye --nano-hq $r --threads $t --out-dir $tmp_dir --iterations $p --genome-size $g
+        flye --nano-hq "$r" --threads "$t" --out-dir "$tmp_dir" --iterations "$p" --genome-size "$g"
     else
         echo "[$(date)] Assembling regular (error rate <15%) ONT reads $r using Flye v$v (polish: ${p}) with $t threads (temporary output directory: $tmp_dir)"
-        flye --nano-raw $r --threads $t --out-dir $tmp_dir --iterations $p --genome-size $g
+        flye --nano-raw "$r" --threads "$t" --out-dir "$tmp_dir" --iterations "$p" --genome-size "$g"
     fi
 
     mv $tmp_dir/assembly.fasta ${pre}.fasta
@@ -69,14 +69,14 @@ run_raven() {
     local r="$d/sample_${i}.fastq"
     local pre
     echo "[$(date)] Assembling long reads from FASTQ file $r using Raven (k=${k}, w=${w}; polish=${p}; threads=${t})"
-    raven --threads $t --polishing-rounds $p --kmer-len $k --window-len $w --disable-checkpoints --graphical-fragment-assembly assemblies/assembly_${i}.gfa $r > assemblies/assembly_${i}.fasta
+    raven --threads "$t" --polishing-rounds "$p" --kmer-len "$k" --window-len "$w" --disable-checkpoints --graphical-fragment-assembly "assemblies/assembly_${i}.gfa" "$r" > "assemblies/assembly_${i}.fasta"
 }
 
 run_miniasm_and_minipolish() {  # Code in the function is adapted from https://github.com/rrwick/Minipolish/blob/main/miniasm_and_minipolish.sh.
     # It takes two positional arguments:
     #  1) a long read file
     #  2) the number of threads to use
-    local i="$i"  # Index of read subset: 01, 02, ..., 12, etc
+    local i="$1"  # Index of read subset: 01, 02, ..., 12, etc
     local d="$2"  # Directory of input reads
     local t="$3"  # Number of threads
     local r="$d/sample_${i}.fastq"  # Input FASTQ file
@@ -89,8 +89,8 @@ run_miniasm_and_minipolish() {  # Code in the function is adapted from https://g
     echo "[$(date)] Assembling reads from $r using miniasm_and_minipolish ($t threads)"
     minimap2 -x ava-ont -t "$t" "$r" "$r" > "$overlaps"  # Find read overlaps with minimap2
     miniasm -f "$r" "$overlaps" > "$unpolished_assembly"  # Run miniasm to make an unpolished assembly
-    minipolish --threads "$t" "$r" "$unpolished_assembly" > assemblies/assembly_${i}.gfa  # Polish the assembly with minipolish, outputting the result to stdout.
-    any2fasta assemblies/assembly_${i}.gfa > assemblies/assembly_${i}.fasta  # Convert the GFA file to a FASTA file
+    minipolish --threads "$t" "$r" "$unpolished_assembly" > "assemblies/assembly_${i}.gfa"  # Polish the assembly with minipolish, outputting the result to stdout.
+    any2fasta "assemblies/assembly_${i}.gfa" > "assemblies/assembly_${i}.fasta"  # Convert the GFA file to a FASTA file
     rm "$overlaps" "$unpolished_assembly"  # Clean up
 }
 
@@ -187,11 +187,11 @@ while [ $j -le $n ]; do
     run_flye "$k" "$dir_in" "$genome_len" "$polish" "$threads" "$high_accuracy_reads"
     j=$(( $j + 1 ))
     if [ $j -le $n ]; then
-        k=$(printf "%02d" $j)
+        k=$(printf "%02d" "$j")
         run_raven "$k" "$dir_in" "$raven_kmer" "$raven_window_len" "$polish" "$threads"
         j=$(( $j + 1 ))
         if [ $j -le $n ]; then
-            k=$(printf "%02d" $j)
+            k=$(printf "%02d" "$j")
             run_miniasm_and_minipolish "$k" "$dir_in" "$threads"
             j=$(( $j + 1 ))
         fi
