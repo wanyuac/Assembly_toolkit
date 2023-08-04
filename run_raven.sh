@@ -22,5 +22,6 @@ if [ -z "$t" ]; then
     echo 'Set the number of threads to 1'
     t=1
 fi
-echo "Assembling long reads from $r using Raven $v (k=${k}, w=${w}; polish=${p}; threads=${t})"
+echo "[$(date)] Assembling long reads from $r using Raven $v (k=${k}, w=${w}; polish=${p}; threads=${t})"
 raven --threads $t --polishing-rounds $p --kmer-len $k --window-len $w --disable-checkpoints --graphical-fragment-assembly ${pre}.gfa $r > ${pre}.fasta
+echo -e "[$(date)] Raven assembly of FASTQ file $r is completed.\n"
