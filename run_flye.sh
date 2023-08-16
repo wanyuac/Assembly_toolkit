@@ -1,6 +1,6 @@
 #!/bin/bash
 # Run Flye to assemble (Oxford Nanopore Technologies) ONT reads
-# run_flye.sh [input read file] [Filename extension of the input read file (fastq/fastq.gz/etc)] [probable genome size] [number of polishing rounds] [number of threads] [error level of reads] [scaffold]
+# run_flye.sh [input read file] [Filename extension of the input read file (fastq/fastq.gz/etc)] [probable genome size] [number of polishing rounds] [number of threads] [error level of reads] "scaffold"
 # Change the number of threads for your computer.
 # Copyright (C) 2022-2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.

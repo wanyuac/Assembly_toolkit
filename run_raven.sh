@@ -4,7 +4,7 @@
 # Change the number of threads for your computer.
 # Copyright (C) 2022-2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 18 Dec 2022; latest update: 3 Jan 2023
+# First version: 18 Dec 2022; latest update: 16 Aug 2023
 
 # Read parameters ###############
 r="$1"  # Input read file
