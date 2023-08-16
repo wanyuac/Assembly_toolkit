@@ -23,33 +23,39 @@ v=`flye --version`
 if [ -z "$t" ]; then
     t=1;
 fi
+
 if [ -z "$m" ]; then
     m="raw"
 fi
+
 if [ ! -z "$s" ]; then
     scaf=true
 else
     scaf=false
 fi
 
-mkdir ./tmp
+mkdir tmp
 
 if [ "$m" == "hq" ]; then
     echo "Assembling high-quality (error rate <5%) ONT reads $r using Flye v$v (polish: ${p}) with $t threads"
-    cmd="--nano-hq $r --threads $t --out-dir ./tmp --iterations $p --genome-size $g"  # --subassemblies is incompatible with --nano-raw or --nano-corr
+    cmd="--nano-hq $r --threads $t --out-dir tmp --iterations $p --genome-size $g"  # --subassemblies is incompatible with --nano-raw or --nano-corr
 else
     echo "Assembling regular (error rate <15%) ONT reads $r using Flye v$v (polish: ${p}) with $t threads"
-    cmd="--nano-raw $r --threads $t --out-dir ./tmp --iterations $p --genome-size $g"
+    cmd="--nano-raw $r --threads $t --out-dir tmp --iterations $p --genome-size $g"
 fi
 
 if [ "$scaf" == true ]; then
     echo "Enable scaffolding"
     cmd="$cmd --scaffold"
 fi
-flye "$cmd"
 
-mv ./tmp/assembly.fasta ${pre}.fasta
-mv ./tmp/assembly_graph.gfa ${pre}.gfa
-mv ./tmp/assembly_info.txt ${pre}.txt
-mv ./tmp/flye.log ${pre}.log
-rm -rf ./tmp
+echo "Run command flye $cmd"
+flye $cmd
+
+if [ -d "tmp" ]; then
+    mv tmp/assembly.fasta ${pre}.fasta
+    mv tmp/assembly_graph.gfa ${pre}.gfa
+    mv tmp/assembly_info.txt ${pre}.txt
+    mv tmp/flye.log ${pre}.log
+    rm -rf tmp
+fi
