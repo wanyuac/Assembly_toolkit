@@ -4,7 +4,7 @@
 # Reference: https://github.com/rrwick/Polypolish/wiki/How-to-run-Polypolish
 # Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 24 December 2022
+# First version: 1 May 2022; latest update: 15 September 2023
 
 # 1. Preparation ###############
 # Read parameters
@@ -12,6 +12,14 @@ i="$1"  # Isolate name
 fasta_in="$2"  # Input FASTA file (path and filename)
 reads_dir="$3"  # Directory of input Illumina reads
 outdir="$4"  # Output directory
+t="$5"  # Number of threads
+
+if [ -z "$t" ]; then
+    echo 'Setting number of threads to 4'
+    t=4
+else
+    echo "Number of threads: $t"
+fi
 
 # Set up input and output paths
 if [ ! -d "$outdir" ]; then
@@ -30,13 +38,13 @@ echo "Creating SAM files for isolate $i"
 tm="sams_$i"
 mkdir $tm
 bwa index $fasta_in
-bwa mem -a -t 4 $fasta_in $r1 > ${tm}/unfiltered_1.sam
-bwa mem -a -t 4 $fasta_in $r2 > ${tm}/unfiltered_2.sam
-~/bin/polypolish-v0.5.0/polypolish_insert_filter.py --in1 ${tm}/unfiltered_1.sam --in2 ${tm}/unfiltered_2.sam --out1 ${tm}/filtered_1.sam --out2 ${tm}/filtered_2.sam 1>${outdir}/log/${i}_SAM_filter.log 2>&1
+bwa mem -a -t $t $fasta_in $r1 > ${tm}/unfiltered_1.sam
+bwa mem -a -t $t $fasta_in $r2 > ${tm}/unfiltered_2.sam
+polypolish_insert_filter.py --in1 ${tm}/unfiltered_1.sam --in2 ${tm}/unfiltered_2.sam --out1 ${tm}/filtered_1.sam --out2 ${tm}/filtered_2.sam 1>${outdir}/log/${i}_SAM_filter.log 2>&1
 
 # 3. Polish the input assembly ###############
 echo "Polishing assembly $fasta_in with Polypolish"
-~/bin/polypolish-v0.5.0/polypolish $fasta_in ${tm}/filtered_1.sam ${tm}/filtered_2.sam 1>${outdir}/${i}_polypolish.fna 2>${outdir}/log/${i}_polypolish.log
+polypolish $fasta_in ${tm}/filtered_1.sam ${tm}/filtered_2.sam 1>${outdir}/${i}_polypolish.fna 2>${outdir}/log/${i}_polypolish.log
 rm -rf $tm
 
 # 4. Removing '_polypolish' from sequence headers to preserve the original ones ###############
