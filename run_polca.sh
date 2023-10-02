@@ -31,7 +31,7 @@ if [ -f "$r1" ] && [ -f "$r2" ]; then
         rmdir $tm
     else
         cd ..
-        cho "Error: the assembly of $i could not be polished."
+        echo "Error: the assembly of $i could not be polished."
     fi
 else
     echo "Skipped isolates $i for the absence of its reads."
