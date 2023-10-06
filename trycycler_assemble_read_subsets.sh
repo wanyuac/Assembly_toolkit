@@ -2,13 +2,13 @@
 # Run Flye, Raven, and Minipolish assembler to assemble subsets of Nanopore reads generated using command "trycycler subsample".
 # Copyright (C) 2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 27 July 2023; last update: 4 August 2023
+# First version: 27 July 2023; last update: 6 October 2023
 
 # Help information ###############
 display_usage() {
     echo "
     This script iteratively runs Raven, Flye, and Miniasm-minipolish to assemble subsets (<100) of Nanopore reads
-    generated using command 'trycycler subset'. Output assemblies (in subdirectory 'assemblies' in the current
+    generated using command 'trycycler subset'. Output assemblies (in subdirectory '1_assemblies' in the current
     working directory) can be used for Trycycler command 'trycycler cluster'.
     
     Preprequsites: please ensure flye, raven, minimap2, miniasm, minipolish, and any2fasta are accessible in
@@ -26,9 +26,11 @@ display_usage() {
     Example useage:
       /usr/local/bin/Assembly_toolkit/trycycler_assemble_read_subsets.sh -d=\"\$HOME/reads/subsets\" -p=2 -t=8 -l=2.5m -h -k=15 -w=5
 
-    Output: directory 'assemblies', which stores assemblies in GFA and FASTA formats, will be created under the current working directory.
+    Output: directory '1_assemblies', which stores assemblies in GFA and FASTA formats, will be created under the current working directory.
     "
 }
+
+output_dir='1_assemblies'
 
 # Assembler runners ###############
 run_flye() {
@@ -39,7 +41,7 @@ run_flye() {
     local t="$5"  # Number of threads
     local h="$6"  # Accuracy level of Nanopore reads: raw (expected error rate: <15%) or hq (<5%)
     local r="$d/sample_${i}.fastq"  # Input FASTQ file
-    local pre="assemblies/assembly_${i}"
+    local pre="${output_dir}/assembly_${i}"
 
     # Generate a genome assembly from long reads ###############
     tmp_dir=$(mktemp -d -t flye-XXXXXXXXXX)  # Create a temporary directory
@@ -67,9 +69,9 @@ run_raven() {
     local p="$5"  # Polish rounds
     local t="$6"  # Number of threads
     local r="$d/sample_${i}.fastq"
-    local pre
+    local pre="${output_dir}/assembly_${i}"
     echo "[$(date)] Assembling long reads from FASTQ file $r using Raven (k=${k}, w=${w}; polish=${p}; threads=${t})"
-    raven --threads "$t" --polishing-rounds "$p" --kmer-len "$k" --window-len "$w" --disable-checkpoints --graphical-fragment-assembly "assemblies/assembly_${i}.gfa" "$r" > "assemblies/assembly_${i}.fasta"
+    raven --threads "$t" --polishing-rounds "$p" --kmer-len "$k" --window-len "$w" --disable-checkpoints --graphical-fragment-assembly "${pre}.gfa" "$r" > "${pre}.fasta"
 }
 
 run_miniasm_and_minipolish() {  # Code in the function is adapted from https://github.com/rrwick/Minipolish/blob/main/miniasm_and_minipolish.sh.
@@ -80,6 +82,7 @@ run_miniasm_and_minipolish() {  # Code in the function is adapted from https://g
     local d="$2"  # Directory of input reads
     local t="$3"  # Number of threads
     local r="$d/sample_${i}.fastq"  # Input FASTQ file
+    local pre="${output_dir}/assembly_${i}"  # Prefix of output files
 
     # Create temporary intermediate files.
     overlaps=$(mktemp)".paf"
@@ -89,8 +92,8 @@ run_miniasm_and_minipolish() {  # Code in the function is adapted from https://g
     echo "[$(date)] Assembling reads from $r using miniasm_and_minipolish ($t threads)"
     minimap2 -x ava-ont -t "$t" "$r" "$r" > "$overlaps"  # Find read overlaps with minimap2
     miniasm -f "$r" "$overlaps" > "$unpolished_assembly"  # Run miniasm to make an unpolished assembly
-    minipolish --threads "$t" "$r" "$unpolished_assembly" > "assemblies/assembly_${i}.gfa"  # Polish the assembly with minipolish, outputting the result to stdout.
-    any2fasta "assemblies/assembly_${i}.gfa" > "assemblies/assembly_${i}.fasta"  # Convert the GFA file to a FASTA file
+    minipolish --threads "$t" "$r" "$unpolished_assembly" > "${pre}.gfa"  # Polish the assembly with minipolish, outputting the result to stdout.
+    any2fasta "${pre}.gfa" > "${pre}.fasta"  # Convert the GFA file to a FASTA file
     rm "$overlaps" "$unpolished_assembly"  # Clean up
 }
 
