@@ -2,7 +2,7 @@
 # Run Flye, Raven, and Minipolish assembler to assemble subsets of Nanopore reads generated using command "trycycler subsample".
 # Copyright (C) 2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 27 July 2023; last update: 6 October 2023
+# First version: 27 July 2023; last update: 9 October 2023
 
 # Help information ###############
 display_usage() {
@@ -170,9 +170,9 @@ if [ -z "$raven_window_len" ]; then
     raven_window_len=5
 fi
 
-if [ ! -d "assemblies" ]; then
-    echo "[$(date)] Output directory 'assemblies' was not found, so create it in the current working directory."
-    mkdir assemblies
+if [ ! -d "$output_dir" ]; then
+    echo "[$(date)] Output directory $output_dir was not found, so create it in the current working directory."
+    mkdir "$output_dir"
 fi
 
 # Assemble subsets of ONT reads ===============
