@@ -2,7 +2,7 @@
 # Run Flye, Raven, and Minipolish assembler to assemble subsets of Nanopore reads generated using command "trycycler subsample".
 # Copyright (C) 2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 27 July 2023; last update: 9 October 2023
+# First version: 27 July 2023; last update: 20 October 2023
 
 # Help information ###############
 display_usage() {
@@ -16,15 +16,17 @@ display_usage() {
 
     Parameters:
       -d=*: directory of input FASTQ files (*.fastq, mandatory, and do not include the final forward slash)
-      -p=*: number of assembly-polishing rounds (default: 2, optional)
-      -t=*: number of threads (default: 1, optional)
+      -p=*: number of assembly-polishing rounds (default: 2; optional)
+      -t=*: number of threads (default: 1; optional)
       -l=*: expected genome length (e.g., 5m) for Flye (mandatory)
-      -h: a flag to instruct Flye to treat input reads as of high quality (error rate <5%, optional)
-      -k=*: length of minimisers used to find overlaps by Raven (default: 15, optional)
-      -w=*: length of sliding window from which minimisers are sampled by Raven (default: 5, optional)
+      -h: a flag to instruct Flye to treat input reads as of high quality (error rate <5%; optional)
+      -k=*: length of minimisers used to find overlaps by Raven (default: 15; optional)
+      -w=*: length of sliding window from which minimisers are sampled by Raven (default: 5; optional)
+      -s=*: start sample index (default: 1; optional); useful when adding more fastq files into a previous run
     
     Example useage:
       /usr/local/bin/Assembly_toolkit/trycycler_assemble_read_subsets.sh -d=\"\$HOME/reads/subsets\" -p=2 -t=8 -l=2.5m -h -k=15 -w=5
+      /usr/local/bin/Assembly_toolkit/trycycler_assemble_read_subsets.sh -d=\"\$HOME/reads/subsets_extra\" -p=2 -t=8 -l=2.5m -h -k=15 -w=5 -s=13
 
     Output: directory '1_assemblies', which stores assemblies in GFA and FASTA formats, will be created under the current working directory.
     "
@@ -46,7 +48,8 @@ run_flye() {
     # Generate a genome assembly from long reads ###############
     tmp_dir=$(mktemp -d -t flye-XXXXXXXXXX)  # Create a temporary directory
     
-    if [ "$h" == true ]; then
+    if [ "$h" == true ]
+    then
         echo "[$(date)] Assembling high-quality (error rate <5%) ONT reads $r using Flye (polish: ${p}) with $t threads (temporary output directory: $tmp_dir)"
         flye --nano-hq "$r" --threads "$t" --out-dir "$tmp_dir" --iterations "$p" --genome-size "$g"
     else
@@ -98,13 +101,17 @@ run_miniasm_and_minipolish() {  # Code in the function is adapted from https://g
 }
 
 # Main ###############
-if [ -z $1 ]; then
+if [ -z $1 ]
+then
     display_usage
     exit
 fi
 
 # Read arguments ===============
-for i in "$@"; do
+index_start=1  # Default value
+
+for i in "$@"
+do
     case $i in
         -d=*)
         dir_in="${i#*=}"  # Directory of input read files sample_01.fastq, sample_02.fastq, ..., sample_xy.fastq
@@ -127,76 +134,94 @@ for i in "$@"; do
         -w=*)
         raven_window_len="${i#*=}"  # Window length for Raven (default: 5)
         ;;
+        -s=*)
+        index_start="${i#*=}"  # Update this value with the user-specified start index of FASTQ filenames
+        ;;
         *)  # Do nothing otherwise.
         ;;
     esac
 done
 
 # Initialisation ===============
-if [ ! -d "$dir_in" ]; then
+if [ ! -d "$dir_in" ]
+then
     echo "[$(date)] Error: directory of input FASTQ files was not found."
     exit
 fi
 
-if [ -z "genome_len" ]; then
+if [ -z "genome_len" ]
+then
     echo "[$(date)] Error: expected genome length was not specified for Raven."
     exit
 fi
 
-if [ -z "$high_accuracy_reads" ]; then
+if [ -z "$high_accuracy_reads" ]
+then
     echo "[$(date)] Flye: tread input reads as raw (error rate <15%)."
     high_accuracy_reads=false
 else
     echo "[$(date)] Flye: tread input reads as high-quality (error rate <5%)"
 fi
 
-if [ -z "$polish" ]; then
+if [ -z "$polish" ]
+then
     echo "[$(date)] Set the number of assembly-polishing rounds to 2."
     polish=2
 fi
 
-if [ -z "$threads" ]; then
+if [ -z "$threads" ]
+then
     echo "[$(date)] Thread number was not specified, so set the number to 1."
     threads=1
 fi
 
-if [ -z "$raven_kmer" ]; then
+if [ -z "$raven_kmer" ]
+then
     echo "[$(date)] Set k-mer length to 15 bp for Raven."
     raven_kmer=15
 fi
 
-if [ -z "$raven_window_len" ]; then
+if [ -z "$raven_window_len" ]
+then
     echo "[$(date)] Set window size to 5 for Raven."
     raven_window_len=5
 fi
 
-if [ ! -d "$output_dir" ]; then
+if [ ! -d "$output_dir" ]
+then
     echo "[$(date)] Output directory $output_dir was not found, so create it in the current working directory."
     mkdir "$output_dir"
 fi
 
 # Assemble subsets of ONT reads ===============
 n=$(find $dir_in -name '*.fastq' -type f | wc -l)
-if [ $n -gt 0 ]; then
+
+if [ $n -gt 0 ]
+then
     echo "[$(date)] Found $n input FASTQ files"
-    j=1
+    j=$index_start
+    m=$((j+n))  # The maximum index + 1
+    echo "FASTQ filenames start from index $j"
 else
     echo "[$(date)] Error: no FASTQ file (.fastq) was found in input directory $dir_in".
     exit
 fi
 
-while [ $j -le $n ]; do
+while [ $j -lt $m ]
+do
     k=$(printf "%02d" $j)  # Add leading zeros to the index when j < 10
     run_flye "$k" "$dir_in" "$genome_len" "$polish" "$threads" "$high_accuracy_reads"
-    j=$(( $j + 1 ))
-    if [ $j -le $n ]; then
+    j=$((j+1))
+    if [ $j -lt $m ]
+    then
         k=$(printf "%02d" "$j")
         run_raven "$k" "$dir_in" "$raven_kmer" "$raven_window_len" "$polish" "$threads"
-        j=$(( $j + 1 ))
-        if [ $j -le $n ]; then
+        j=$((j+1))
+        if [ $j -lt $m ]
+        then
             k=$(printf "%02d" "$j")
             run_miniasm_and_minipolish "$k" "$dir_in" "$threads"
-            j=$(( $j + 1 ))
+            j=$((j+1))
         fi
     fi
 done
