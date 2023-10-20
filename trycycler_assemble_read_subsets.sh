@@ -157,10 +157,10 @@ fi
 
 if [ -z "$high_accuracy_reads" ]
 then
-    echo "[$(date)] Flye: tread input reads as raw (error rate <15%)."
+    echo "[$(date)] Flye: treats input reads as raw (error rate <15%)."
     high_accuracy_reads=false
 else
-    echo "[$(date)] Flye: tread input reads as high-quality (error rate <5%)"
+    echo "[$(date)] Flye: treats input reads as high-quality (error rate <5%)"
 fi
 
 if [ -z "$polish" ]
