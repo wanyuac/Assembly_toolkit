@@ -75,4 +75,6 @@ perl -p -e 's/\x1b\[[0-9;]*[mG]//g' ${outdir}/log/${polypolish_prefix}.txt > ${o
 perl -p -e 's/\x1b\[[0-9;]*[mG]//g' ${outdir}/log/${sam_filter_prefix}.txt > ${outdir}/log/${sam_filter_prefix}.log
 rm ${outdir}/log/${polypolish_prefix}.txt ${outdir}/log/${sam_filter_prefix}.txt
 
+# 6. Clean up ###############
+rm "$fasta_in".*
 echo "$(date): Finished polishing the assembly of isolate ${i}"
