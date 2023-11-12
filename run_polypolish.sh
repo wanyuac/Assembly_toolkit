@@ -29,8 +29,8 @@ display_parameters() {
       -t=*: number of threads (default: 2)
     
     Example command:
-      /usr/local/bin/Assembly_toolkit/run_polypolish.sh -a=assembly.fasta -r=reads/illumina \
-      -i=isolate_1 -o=polca -t=8
+      /usr/local/bin/Assembly_toolkit/run_polypolish.sh -a=assembly.fasta -r=reads/illumina \\
+        -i=isolate_1 -o=polca -t=8
     
     Outputs:
       1. a polished assembly [o]/[n]_polypolish.fna in FASTA format

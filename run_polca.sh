@@ -30,8 +30,8 @@ display_parameters() {
       -t=*: number of threads (default: 2)
     
     Example command:
-      /usr/local/bin/Assembly_toolkit/run_polca.sh -a=assembly.fasta -r=reads/illumina \
-      -i=isolate_1 -o=polca -p=$HOME/bin/MaSuRCA-4.0.5/bin -t=8 > isolate_1_polca.log
+      /usr/local/bin/Assembly_toolkit/run_polca.sh -a=assembly.fasta -r=reads/illumina \\
+        -i=isolate_1 -o=polca -p=$HOME/bin/MaSuRCA-4.0.5/bin -t=8 > isolate_1_polca.log
     
     Output: a polished assembly [o]/[n]_polca.fna in FASTA format
     "
