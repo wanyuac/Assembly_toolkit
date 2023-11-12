@@ -106,7 +106,7 @@ fi
 
 if [ -f "$fasta_in" ]
 then
-    echo "run_polypolish.sh v$SCRIPT_VERSION"
+    echo "run_polypolish.sh v$SCRIPT_VERSION" > "${output_prefix}.txt"
 
     # Set up output directories and filenames
     if [ ! -d "$outdir" ]
@@ -118,7 +118,7 @@ then
     echo "Start to polish $fasta_in of isolate $i with reads from $read_dir and save outputs in ${outdir}/"
 
     # Filtering read alignments to exclude those of unusually large insert sizes ###############
-    echo "$(date): Creating SAM files for isolate $i" > "${output_prefix}.txt"
+    echo "$(date): Creating SAM files for isolate $i" >> "${output_prefix}.txt"
     tm="sams_$i"
     mkdir $tm
     bwa index $fasta_in
