@@ -106,6 +106,8 @@ fi
 
 if [ -f "$fasta_in" ]
 then
+    echo "run_polypolish.sh v$SCRIPT_VERSION"
+
     # Set up output directories and filenames
     if [ ! -d "$outdir" ]
     then
