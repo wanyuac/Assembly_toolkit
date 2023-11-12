@@ -91,8 +91,8 @@ fi
 
 if [ -d "$read_dir" ]
 then
-    r1="${reads_dir}/${i}_1.fastq.gz"
-    r2="${reads_dir}/${i}_2.fastq.gz"
+    r1="${read_dir}/${i}_1.fastq.gz"
+    r2="${read_dir}/${i}_2.fastq.gz"
     if [ ! -f "$r1" ] || [ ! -f "$r2" ]
     then
         echo "Error: read file $r1 and/or $r2 were not found."
@@ -115,7 +115,7 @@ then
         mkdir "$outdir"
     fi
     output_prefix="${outdir}/${n}_polypolish"
-    echo "Start to polish $fasta_in of isolate $i with reads from $reads_dir and save outputs in ${outdir}/"
+    echo "Start to polish $fasta_in of isolate $i with reads from $read_dir and save outputs in ${outdir}/"
 
     # Filtering read alignments to exclude those of unusually large insert sizes ###############
     echo "$(date): Creating SAM files for isolate $i" > "${output_prefix}.txt"
