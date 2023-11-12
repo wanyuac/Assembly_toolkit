@@ -129,7 +129,7 @@ then
         tm="polca_tmp_$i"
         mkdir $tm  # Create a temporary directory in the current working directory
         cd $tm
-        echo "$(date): Start to polish $fasta_in of isolates $i with reads from $read_dir and $t threads"
+        echo "$(date): Start to polish $fasta_in of isolates $i with reads $r1 and $r2 and with $t threads"
         $polca -a $fasta_in -r "$r1 $r2" -t "$t" -m 8G
         polca_out="${fasta_name}.PolcaCorrected.fa"
         fasta_out="${outdir}/${n}_polca.fna"
