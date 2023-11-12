@@ -106,6 +106,7 @@ fi
 
 if [ -f "$fasta_in" ]
 then
+    output_prefix="${outdir}/${n}_polypolish"
     echo "run_polypolish.sh v$SCRIPT_VERSION" > "${output_prefix}.txt"
 
     # Set up output directories and filenames
@@ -114,7 +115,6 @@ then
         echo "Create output directory $outdir"
         mkdir "$outdir"
     fi
-    output_prefix="${outdir}/${n}_polypolish"
     echo "Start to polish $fasta_in of isolate $i with reads from $read_dir and save outputs in ${outdir}/"
 
     # Filtering read alignments to exclude those of unusually large insert sizes ###############
