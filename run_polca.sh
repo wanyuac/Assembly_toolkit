@@ -1,43 +1,155 @@
 #!/bin/bash
 # run_polca.sh [isolate name] [input FASTA file] [Directory of short reads] [output directory] [Polca's directory] [number of threads]
+# The prefix of output filenames can be "2_${sample_name}", etc.
 # Prerequisites: python v3, BWA
 # Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 2 Oct 2023
+# First version: 1 May 2022; latest update: 12 Nov 2023
 
-# Read parameters ###############
-i=$1
-fasta_in=$2
-reads_dir=$3
-outdir=$4
-polca_dir=$5  # Where polca.sh is found (no last forward slash)
-t=$6  # Number of threads
+SCRIPT_VERSION=1.0.0
 
-if [ -z "$t" ]; then
-    t=2
+# Function definitions ###############
+# Run './run_polca.sh' to display the information below.
+display_parameters() {
+    echo "
+    run_polca.sh v$SCRIPT_VERSION
+
+    This script polishes an input genome assembly with POLCA and paired-end short reads.
+
+    Prerequisites: please ensure bwa aligner is accessible in PATH.
+
+    Parameters (seven in total):
+      -a=*: path and filename of the input assembly in FASTA format (mandatory)
+      -r=*: path to the directory of paired-end short reads (without the end forward
+            slash), where read files' names follow format [sample name]_[1,2].fastq.gz (mandatory)
+      -i=*: isolate name (default: isolate)
+      -n=*: prefix of output filenames (default: isolate)
+      -o=*: path to output directory (default: polca_output)
+      -p=*: MaSuRCA/bin directory (without the end forward slash), where polca.sh is
+            stored (mandatory)
+      -t=*: number of threads (default: 2)
+    
+    Example command:
+      /usr/local/bin/Assembly_toolkit/run_polca.sh -a=assembly.fasta -r=reads/illumina \
+      -i=isolate_1 -o=polca -p=$HOME/bin/MaSuRCA-4.0.5/bin -t=8 > isolate_1_polca.log
+    
+    Output: a polished assembly [o]/[n]_polca.fna in FASTA format
+    "
+}
+
+MYDIR="$(dirname "$(readlink -f "$0")")"  # Directory of this script
+source $MYDIR/modules.sh  # Function print_failure_message
+
+# Print parameter information ###############
+if [ -z "$1" ]
+then
+    display_parameters
+    exit
 fi
 
-# Run POLCA for the input genome ###############
-fasta_name=`basename $fasta_in`
-r1=${reads_dir}/${i}_1.fastq.gz
-r2=${reads_dir}/${i}_2.fastq.gz
-if [ -f "$r1" ] && [ -f "$r2" ]; then
-    tm="polca_tmp_$i"
-    mkdir $tm
-    cd $tm
-    echo "Polishing assembly $fasta_in for isolates $i with reads from $reads_dir"
-    $polca_dir/polca.sh -a $fasta_in -r "$r1 $r2" -t "$t" -m 8G
-    fasta_out="${fasta_name}.PolcaCorrected.fa"
-    if [ -f "$fasta_out" ]; then
-        cd ..
-        echo "Moving $tm/$fasta_out to ${outdir}/${i}_polca.fna"
-        mv $tm/$fasta_out ${outdir}/${i}_polca.fna  # Output FASTA file and its name
-        rm $tm/*.*
-        rmdir $tm
-    else
-        cd ..
-        echo "Error: the assembly of $i could not be polished."
+# Set default values ###############
+i=isolate
+n="$i"
+outdir=polca_output
+t=2
+
+# Read parameters ###############
+for arg in "$@"
+do
+    case $arg in
+        -a=*)
+        fasta_in="${arg#*=}"
+        ;;
+        -r=*)
+        read_dir="${arg#*=}"
+        ;;
+        -i=*)
+        i="${arg#*=}"
+        ;;
+        -n=*)
+        n="${arg#*=}"
+        ;;
+        -o=*)
+        outdir="${arg#*=}"
+        ;;
+        -p=*)
+        polca_dir="${arg#*=}"
+        ;;
+        -t=*)
+        t="${arg#*=}"
+        ;;
+        *)
+        ;;
+    esac
+done
+
+# Run POLCA for the input genome assembly ###############
+if [ -z "$(which bwa)" ] 
+then
+    echo "Error: bwa was not accessible"
+    print_failure_message "$i"
+    exit
+fi
+
+if [ -f "$fasta_in"]
+then
+    fasta_name=`basename $fasta_in`
+else
+    echo "Error: assembly $fasta_in was not found."
+    exit
+fi
+
+if [ -d "$read_dir" ]
+then
+    r1=${read_dir}/${i}_1.fastq.gz
+    r2=${read_dir}/${i}_2.fastq.gz
+    if [ ! -f "$r1" ] || [ ! -f "$r2" ]  # '-f' works for symbolic links
+    then
+        echo "Error: read file $r1 and/or $r2 were not found."
+        print_failure_message "$i"
+        exit
     fi
 else
-    echo "Skipped isolates $i for the absence of its reads."
+    echo "Error: read directory $read_dir was not found."
+    print_failure_message "$i"
+    exit
+fi
+
+if [ -d "$polca_dir" ]
+then
+    polca="$polca_dir/polca.sh"
+    if [ -f "$polca" ]
+    then
+        echo "run_polca.sh v$SCRIPT_VERSION"
+        if [ ! -d "$outdir" ]
+        then
+            echo "Create output directory $outdir"
+            mkdir $outdir
+        fi
+        tm="polca_tmp_$i"
+        mkdir $tm  # Create a temporary directory in the current working directory
+        cd $tm
+        echo "$(date): Start to polish $fasta_in of isolates $i with reads from $read_dir and $t threads"
+        $polca -a $fasta_in -r "$r1 $r2" -t "$t" -m 8G
+        polca_out="${fasta_name}.PolcaCorrected.fa"
+        fasta_out="${outdir}/${n}_polca.fna"
+        if [ -f "$polca_out" ]
+        then
+            cd ..
+            echo "Saving $tm/$polca_out to $fasta_out"
+            mv "$tm/$polca_out" "$fasta_out"  # Output FASTA file and its name
+            rm -r $tm  # Delete the temporary directory and its content
+            rm "$fasta_in".fai
+            echo "Success: polished assembly of isolate $i was saved as ${fasta_out}."
+        else
+            echo "Error: output file $polca_out was not found. Please check files in $tm for details."
+            print_failure_message "$i"
+        fi
+    else
+        echo "Error: script $polca was not found."
+        print_failure_message "$i"
+    fi
+else
+    echo "Error: POLCA directory $polca_dir was not found."
+    print_failure_message "$i"
 fi
