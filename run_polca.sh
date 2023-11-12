@@ -91,7 +91,7 @@ then
     exit
 fi
 
-if [ -f "$fasta_in"]
+if [ -f "$fasta_in" ]
 then
     fasta_name=`basename $fasta_in`
 else
