@@ -5,7 +5,7 @@
 # Reference: https://github.com/rrwick/Polypolish/wiki/How-to-run-Polypolish
 # Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 12 Nov 2023
+# First version: 1 May 2022; latest update: 16 Dec 2023
 
 SCRIPT_VERSION=1.0.0
 
@@ -22,7 +22,7 @@ display_parameters() {
     Parameters (six in total):
       -a=*: path and filename of the input assembly in FASTA format (mandatory)
       -r=*: path to the directory of paired-end short reads (without the end forward
-            slash), where read files' names follow format [sample name]_[1,2].fastq.gz (mandatory)
+            slash), where read files' names follow format [isolate name]_[1,2].fastq.gz (mandatory)
       -i=*: isolate name (default: isolate)
       -n=*: prefix of output filenames (default: isolate)
       -o=*: path to output directory (default: polypolish_output)
@@ -93,7 +93,7 @@ if [ -d "$read_dir" ]
 then
     r1="${read_dir}/${i}_1.fastq.gz"
     r2="${read_dir}/${i}_2.fastq.gz"
-    if [ ! -f "$r1" ] || [ ! -f "$r2" ]
+    if [ ! -e "$r1" ] || [ ! -e "$r2" ]  # $r1 and $r2 can be files or symbolic links
     then
         echo "Error: read file $r1 and/or $r2 were not found."
         print_failure_message "$i"
