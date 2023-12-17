@@ -3,7 +3,7 @@
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
 # First version: 1 May 2022; latest update: 17 Dec 2023
 
-SCRIPT_VERSION=1.0.0
+SCRIPT_VERSION=1.1.0
 
 # Function definitions ###############
 # Run './run_polca.sh' to display the information below.
@@ -88,9 +88,10 @@ then
     exit
 fi
 
-if [ -f "$fasta_in" ]
+if [ -e "$fasta_in" ]
 then
     fasta_name=`basename $fasta_in`
+    echo "Base name of the input FASTA file: $fasta_name"
 else
     echo "Error: assembly $fasta_in was not found."
     exit
