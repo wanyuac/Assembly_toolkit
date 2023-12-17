@@ -27,11 +27,11 @@ display_parameters() {
     
     Example command:
       /usr/local/bin/Assembly_toolkit/run_polypolish.sh -a=1_isolate1_medaka.fasta -r=reads/illumina \\
-        -i=isolate1 -n="2_isolate1_polypolish_1" -o="$PWD" -t=8
+        -i=isolate1 -n="2_isolate1" -o="$PWD" -t=8
     
     Outputs:
-      1. a polished assembly [o]/[n].fna in FASTA format
-      2. a log of messages from Polypolish's scripts [o]/[n].log
+      1. a polished assembly [o]/[n]_polypolish.fna in FASTA format
+      2. a log of messages from Polypolish's scripts [o]/[n]_polypolish.log
     "
 }
 
