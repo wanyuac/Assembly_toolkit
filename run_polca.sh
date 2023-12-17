@@ -16,7 +16,7 @@ display_parameters() {
     Prerequisites: please ensure bwa aligner is accessible in PATH.
 
     Parameters (seven in total):
-      -a=*: path and filename of the input assembly in FASTA format (mandatory)
+      -a=*: absolute path and filename of the input assembly in FASTA format (mandatory)
       -r=*: path to the directory of paired-end short reads (without the end forward
             slash), where read files' names follow format [sample name]_[1,2].fastq.gz (mandatory)
       -i=*: isolate name (default: isolate)
@@ -27,8 +27,8 @@ display_parameters() {
       -t=*: number of threads (default: 2)
     
     Example command:
-      /usr/local/bin/Assembly_toolkit/run_polca.sh -a=1_isolate1_polypolish.fasta -r=reads/illumina \\
-        -i=isolate1 -n=3_isolate1 -o="$PWD" -p=$HOME/bin/MaSuRCA-4.0.5/bin -t=8 > 3_isolate1_polca.log
+      /usr/local/bin/Assembly_toolkit/run_polca.sh -a=\$PWD/1_isolate1_polypolish.fasta -r=reads/illumina \\
+        -i=isolate1 -n=3_isolate1 -o="\$PWD" -p=\$HOME/bin/MaSuRCA-4.0.5/bin -t=8 > 3_isolate1_polca.log
     
     Output: a polished assembly [o]/[n]_polca.fna in FASTA format
     "
