@@ -5,7 +5,7 @@
 # Reference: https://github.com/rrwick/Polypolish/wiki/How-to-run-Polypolish
 # Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 16 Dec 2023
+# First version: 1 May 2022; latest update: 17 Dec 2023
 
 SCRIPT_VERSION=1.0.0
 
@@ -29,12 +29,12 @@ display_parameters() {
       -t=*: number of threads (default: 2)
     
     Example command:
-      /usr/local/bin/Assembly_toolkit/run_polypolish.sh -a=assembly.fasta -r=reads/illumina \\
-        -i=isolate_1 -o=polca -t=8
+      /usr/local/bin/Assembly_toolkit/run_polypolish.sh -a=1_isolate1_medaka.fasta -r=reads/illumina \\
+        -i=isolate1 -n="2_isolate1_polypolish_1" -o="$PWD" -t=8
     
     Outputs:
-      1. a polished assembly [o]/[n]_polypolish.fna in FASTA format
-      2. a log of messages from Polypolish's scripts [o]/[n]_polypolish.log
+      1. a polished assembly [o]/[n].fna in FASTA format
+      2. a log of messages from Polypolish's scripts [o]/[n].log
     "
 }
 
