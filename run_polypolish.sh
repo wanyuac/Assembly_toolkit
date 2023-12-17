@@ -1,9 +1,6 @@
 #!/bin/bash
-# run_polypolish.sh [isolate name] [input FASTA file] [directory of short reads] [output directory] [prefix of output files]
-# The prefix of output filenames can be "1_${sample_name}" or "3_${sample_name}", etc.
-# Prerequisites: python v3, BWA
 # Reference: https://github.com/rrwick/Polypolish/wiki/How-to-run-Polypolish
-# Copyright (C) 2022 Yu Wan <wanyuac@126.com>
+# Copyright (C) 2022-2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
 # First version: 1 May 2022; latest update: 17 Dec 2023
 

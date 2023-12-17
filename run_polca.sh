@@ -1,10 +1,7 @@
 #!/bin/bash
-# run_polca.sh [isolate name] [input FASTA file] [Directory of short reads] [output directory] [Polca's directory] [number of threads]
-# The prefix of output filenames can be "2_${sample_name}", etc.
-# Prerequisites: python v3, BWA
-# Copyright (C) 2022 Yu Wan <wanyuac@126.com>
+# Copyright (C) 2022-2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 12 Nov 2023
+# First version: 1 May 2022; latest update: 17 Dec 2023
 
 SCRIPT_VERSION=1.0.0
 
@@ -30,10 +27,10 @@ display_parameters() {
       -t=*: number of threads (default: 2)
     
     Example command:
-      /usr/local/bin/Assembly_toolkit/run_polca.sh -a=assembly.fasta -r=reads/illumina \\
-        -i=isolate_1 -o=polca -p=$HOME/bin/MaSuRCA-4.0.5/bin -t=8 > isolate_1_polca.log
+      /usr/local/bin/Assembly_toolkit/run_polca.sh -a=1_isolate1_polypolish_1.fasta -r=reads/illumina \\
+        -i=isolate1 -n=3_isolate1_polca -o="$PWD" -p=$HOME/bin/MaSuRCA-4.0.5/bin -t=8 > 3_isolate1_polca.log
     
-    Output: a polished assembly [o]/[n]_polca.fna in FASTA format
+    Output: a polished assembly [o]/[n].fna in FASTA format
     "
 }
 
