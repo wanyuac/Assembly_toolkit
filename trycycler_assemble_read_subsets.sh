@@ -214,17 +214,17 @@ while [ $j -lt $m ]
 do
     k=$(printf "%02d" $j)  # Add leading zeros to the index when j < 10
     run_flye "$k" "$dir_in" "$genome_len" "$polish" "$threads" "$high_accuracy_reads"
-    j=$((j+1))
+    ((j++))
     if [ $j -lt $m ]
     then
         k=$(printf "%02d" "$j")
         run_raven "$k" "$dir_in" "$raven_kmer" "$raven_window_len" "$polish" "$threads"
-        j=$((j+1))
+        ((j++))
         if [ $j -lt $m ]
         then
             k=$(printf "%02d" "$j")
             run_miniasm_and_minipolish "$k" "$dir_in" "$threads"
-            j=$((j+1))
+            ((j++))
         fi
     fi
 done
