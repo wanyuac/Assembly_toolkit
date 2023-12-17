@@ -2,7 +2,7 @@
 # Run Flye, Raven, and Minipolish assembler to assemble subsets of Nanopore reads generated using command "trycycler subsample".
 # Copyright (C) 2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 27 July 2023; last update: 20 October 2023
+# First version: 27 July 2023; last update: 17 December 2023
 
 # Help information ###############
 display_usage() {
@@ -29,6 +29,9 @@ display_usage() {
       /usr/local/bin/Assembly_toolkit/trycycler_assemble_read_subsets.sh -d=\"\$HOME/reads/subsets_extra\" -p=2 -t=8 -l=2.5m -h -k=15 -w=5 -s=13
 
     Output: directory '1_assemblies', which stores assemblies in GFA and FASTA formats, will be created under the current working directory.
+
+    Note: when parameter s > 1, the directory of input reads must contain corresponding FASTQ files. For example, when s = 16, the directory
+    must have sample_16.fastq, etc. Otherwise, assemblers will return an error of missing inputs.
     "
 }
 
