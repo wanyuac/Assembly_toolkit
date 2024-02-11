@@ -42,7 +42,7 @@ def main():
                 for seq in SeqIO.parse(fasta_in_handle, "fasta"):  # Go through sequences in the input FASTA file
                     seq_name = seq.id
                     modifier_fields = [construct_seq_descr(r, m) for m in modifiers]
-                    modifier_fields.remove('')  # Ignore null modifiers
+                    modifier_fields = list(filter(None, modifier_fields))  # Remove NA cells
                     if seq_name.startswith(plasmid_prefix):  # The current sequence is a plasmid
                         modifier_fields.append(f"[plasmid-name={seq_name}]")
                     write_seq(seq_name = seq_name, seq_descr = ' '.join(modifier_fields), seq = str(seq.seq),\
