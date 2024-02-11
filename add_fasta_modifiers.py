@@ -51,6 +51,7 @@ def main():
                         modifier_fields.append(f"[plasmid-name={seq_name}]")
                         seq_type = 'plasmid'
                     else:
+                        modifier_fields.append(f"[location=chromosome]")  # Define the current sequence as a chromosome.
                         seq_type = 'chromosome'
                     s = str(seq.seq)
                     modifier_string = ' '.join(modifier_fields)
