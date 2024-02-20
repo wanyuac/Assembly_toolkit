@@ -8,7 +8,7 @@ The input TSV file must have a column 'file' or paths of input FASTA files are s
 
 Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Publication: 11 February 2024; the latest update: 12 February 2024.
+Publication: 11 February 2024; the latest update: 20 February 2024.
 """
 
 import os
@@ -16,6 +16,7 @@ import sys
 import pandas as pd
 from Bio import SeqIO
 from argparse import ArgumentParser
+from modules.utilities import write_seq  # A local module defined in modules/write_seq.py
 
 def parse_arguments():
     parser = ArgumentParser(description = "Adding modifiers to sequence headers in FASTA files")
@@ -93,13 +94,6 @@ def construct_seq_descr(r, m):
     else:
         y = f"[{m}={v}]"
     return y
-
-
-def write_seq(seq_name, seq_descr, seq, fasta_handle):
-    """ Write a sequence in the FASTA format """
-    fasta_handle.write(f">{seq_name} {seq_descr}\n")
-    fasta_handle.write(seq + '\n')
-    return
 
 
 if __name__ == '__main__':
