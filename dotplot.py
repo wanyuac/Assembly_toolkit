@@ -8,7 +8,7 @@ Dependencies: Python v3, BioPython, PIL (pip install Pillow)
 
 Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Creation: 28 September 2022; the latest update: 5 Nov 2022
+Creation: 28 September 2022; the latest update: 20 July 2024
 
 Appendix: Copyright information of Ryan Wick's dotplot.py
 'Copyright 2020 Ryan Wick (rrwick@gmail.com)
@@ -36,7 +36,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageColor
 INITIAL_TOP_LEFT_GAP = 0.1
 BORDER_GAP = 0.015
 OUTLINE_WIDTH = 0.0015
-TEXT_GAP = 0.0025
+TEXT_GAP = 0.005
 MAX_FONT_SIZE = 0.020
 BACKGROUND_COLOUR = 'white'
 FILL_COLOUR = 'lightgrey'
@@ -220,17 +220,20 @@ def get_font(draw, label, font_size, start_position, end_position):
 
     # If we had to resort to the default font, then we can't size it.
     if is_default_font:
-        text_width, text_height = draw.textsize(label, font=font)
+        left, top, right, bottom = font.getbbox(label)  # Updated for new Pillow package; depreciated code: "text_width, text_height = draw.textsize(label, font=font)"
+        text_width, text_height = right - left, bottom - top
         return font, text_width, text_height, font_size
 
     # If we have a size-able font, then we adjust the size down until the text fits in the
     # available space.
     available_width = end_position - start_position
-    text_width, text_height = draw.textsize(label, font = font)
+    left, top, right, bottom = font.getbbox(label)
+    text_width, text_height = right - left, bottom - top  # Depreciated: text_width, text_height = draw.textsize(label, font = font)
     while text_width > available_width:
         font_size -= 1
         font, _ = load_font(font_size)
-        text_width, text_height = draw.textsize(label, font = font)
+        left, top, right, bottom = font.getbbox(label)
+        text_width, text_height = right - left, bottom - top  # Depreciated: text_width, text_height = draw.textsize(label, font = font)
     return font, text_width, text_height, font_size
 
 
