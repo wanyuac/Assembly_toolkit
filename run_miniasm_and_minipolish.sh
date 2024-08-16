@@ -8,9 +8,9 @@
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
 # First version: 29 Janurary 2024; latest update: 16 August 2024
 
-local i="$1"  # Isolate name
-local r="$2"  # input reads
-local t="$3"  # Number of threads
+i="$1"  # Isolate name
+r="$2"  # Input long reads
+t="$3"  # Number of threads
 
 # Create temporary intermediate files.
 overlaps=$(mktemp)".paf"
