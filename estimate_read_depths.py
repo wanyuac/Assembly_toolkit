@@ -62,7 +62,6 @@ def main():
     else:
         reads = Reads(r1 = args.r1, r2 = args.r2)
     estimate_depths(reads, args, software, log)
-
     return
 
 
@@ -78,7 +77,6 @@ def initiate_outputs(outdir, prefix):
             log_f.write(f"Warning: created output directory {outdir} since was not found.\n")
     else:
         open(log, 'w').close()  # Create an empty log file
-    
     return log
 
 
@@ -102,7 +100,6 @@ def find_software(n, p, log):
         if software_path is None:
             add_log(f"Error: {n} was not found in the system PATH", log)
             sys.exit(1)
-    
     return software_path
 
 
@@ -111,7 +108,6 @@ def check_dependencies(args, log):
     samtools_path = find_software('samtools', args.samtools_dir, log)
     mosdepth_path = find_software('mosdepth', args.mosdepth_dir, log)
     software_paths = Software(minimap2 = minimap2_path, samtools = samtools_path, mosdepth = mosdepth_path)
-    
     return software_paths
 
 
@@ -132,7 +128,6 @@ def print_run_info(software, args, log):
     lines.append(f"Minimap2: {software.minimap2}")
     lines.append(f"Samtools: {software.samtools}")
     add_log('\n'.join(lines) + '\n', log)
-    
     return
 
 
@@ -144,7 +139,6 @@ def execute_command(command, command_name, log_file):
     except subprocess.CalledProcessError as err:  # Log error if command fails
         add_log(f"Error:\n{err.stderr}", log_file)
         sys.exit(1)
-    
     return
 
 
