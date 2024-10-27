@@ -21,8 +21,8 @@ from datetime import datetime
 from collections import namedtuple
 
 # Define data classes ###############
-Software = namedtuple('Software', ['minimap2', 'samtools', 'mosdepth'])
 Reads = namedtuple('Reads', ['r1', 'r2'])
+Software = namedtuple('Software', ['minimap2', 'samtools', 'mosdepth'])
 
 def parse_arguments():  # https://stackoverflow.com/questions/7066826/in-python-how-to-get-subparsers-to-read-in-parent-parsers-argument
     # Shared arguments
@@ -48,7 +48,7 @@ def parse_arguments():  # https://stackoverflow.com/questions/7066826/in-python-
     parser_illumina = subparsers.add_parser(name = 'illuminaPE', parents = [parser_common], help = "Estimate read depth for Illumina paired-end reads")
     parser_illumina.add_argument('--r1', dest = 'r1', help = "Illumina read file 1 for forward reads")
     parser_illumina.add_argument('--r2', dest = 'r2', help = "Illumina read file 2 for reverse reads")
-    
+
     return parser_parent.parse_args()
 
 
@@ -85,7 +85,6 @@ def initiate_outputs(outdir, prefix):
 def add_log(message, log):
     with open(log, 'a') as log_file:
         print(message + '\n', file = log_file)
-    
     return
 
 
@@ -112,7 +111,7 @@ def check_dependencies(args, log):
     samtools_path = find_software('samtools', args.samtools_dir, log)
     mosdepth_path = find_software('mosdepth', args.mosdepth_dir, log)
     software_paths = Software(minimap2 = minimap2_path, samtools = samtools_path, mosdepth = mosdepth_path)
-
+    
     return software_paths
 
 
@@ -133,7 +132,7 @@ def print_run_info(software, args, log):
     lines.append(f"Minimap2: {software.minimap2}")
     lines.append(f"Samtools: {software.samtools}")
     add_log('\n'.join(lines) + '\n', log)
-
+    
     return
 
 
@@ -145,6 +144,7 @@ def execute_command(command, command_name, log_file):
     except subprocess.CalledProcessError as err:  # Log error if command fails
         add_log(f"Error:\n{err.stderr}", log_file)
         sys.exit(1)
+    
     return
 
 
@@ -182,7 +182,7 @@ def estimate_depths(reads, args, software, log):
     filtered_summary = mosdepth_output_prefix + '_mosdepth_depth_per_contig.tsv'
     command = f"awk 'NR==1 || $1 !~ /_region/' {depth_summary} > {filtered_summary}"
     execute_command(command, 'awk', log)
-
+    
     return
 
 
