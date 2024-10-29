@@ -1,8 +1,8 @@
 #!/bin/bash
 # Run Flye, Raven, and Minipolish assembler to assemble subsets of Nanopore reads generated using command "trycycler subsample".
-# Copyright (C) 2023 Yu Wan <wanyuac@126.com>
+# Copyright (C) 2023 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 27 July 2023; last update: 17 December 2023
+# First version: 27 July 2023; last update: 29 October 2024
 
 # Help information ###############
 display_usage() {
