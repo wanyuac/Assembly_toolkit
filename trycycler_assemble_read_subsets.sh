@@ -4,6 +4,9 @@
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
 # First version: 27 July 2023; last update: 31 October 2024
 
+# Default value ###############
+output_dir='1_assemblies'  # Default output directory
+
 # Help information ###############
 display_usage() {
     echo "
@@ -16,7 +19,7 @@ display_usage() {
 
     Parameters:
       -d=*: directory of input FASTQ files (*.fastq, mandatory, and do not include the final forward slash)
-      -o=*: output directory
+      -o=*: output directory (default: ${output_dir})
       -p=*: number of assembly-polishing rounds (default: 2; optional)
       -t=*: number of threads (default: 1; optional)
       -l=*: expected genome length (e.g., 5m) for Flye (mandatory)
@@ -35,8 +38,6 @@ display_usage() {
     must have sample_16.fastq, etc. Otherwise, assemblers will return an error of missing inputs.
     "
 }
-
-output_dir='1_assemblies'  # Default output directory
 
 # Assembler runners ###############
 run_flye() {
