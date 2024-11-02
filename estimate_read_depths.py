@@ -26,7 +26,7 @@ Software = namedtuple('Software', ['minimap2', 'samtools', 'mosdepth'])
 
 def parse_arguments():  # https://stackoverflow.com/questions/7066826/in-python-how-to-get-subparsers-to-read-in-parent-parsers-argument
     # Shared arguments
-    parser_common = argparse.ArgumentParser(description = "Estimate read depths for genome assemblies.", add_help=False)
+    parser_common = argparse.ArgumentParser(description = "Estimate read depths for genome assemblies.", add_help = False)
     parser_common.add_argument('--assembly', dest = 'assembly', type = str, required = True, help = "Input FASTA file of the genome assembly to be analysed")
     parser_common.add_argument('--prefix', dest = 'prefix', type = str, required = True, help = "Prefix for output files")
     parser_common.add_argument('--output_dir', dest = 'output_dir', type = str, required = False, default = '.', help = "Directory to save output files (default: current working directory)")
