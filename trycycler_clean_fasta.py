@@ -47,6 +47,7 @@ def main():
     excl_tab = read_exclusion_table(args.excl_tab)
     for fasta_filename, contig_names in excl_tab.items():
         filter_fasta(fasta_filename, contig_names, input_dir, org_dir, rm_dir)
+
     return
 
 
