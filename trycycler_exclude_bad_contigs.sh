@@ -14,7 +14,7 @@ display_usage() {
       -t=*: A two-column TSV file listing cluster indices (e.g., 001, 002) and filenames without .fasta (e.g., L_utg000002c)
     
     Example useage:
-      /usr/local/bin/Assembly_toolkit/trycycler_exclude_bad_contigs.sh -d=\"\$HOME/reads/subsets\" -p=2 -t=8 -l=2.5m -h -k=15 -w=5
+      /usr/local/bin/Assembly_toolkit/trycycler_exclude_bad_contigs.sh -i=2_clusters -t=contigs_to_exclude.tsv
     "
 }
 
