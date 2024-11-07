@@ -92,13 +92,16 @@ then
         fi
         cluster_dir="$dir_in/cluster_${c}"
         trycycler reconcile --reads $reads --cluster_dir "$cluster_dir" --threads $t > "${log_filename}.tmp" 2>&1
-        perl -pe 's/\x1b\[[0-9;]*[mG]//g' "${log_filename}.tmp" > "$dir_in/${log_filename}.log"  # Remove colour code from the original log file
+        log_file="$dir_in/${log_filename}.log"
+        perl -pe 's/\x1b\[[0-9;]*[mG]//g' "${log_filename}.tmp" > "$log_file"  # Remove colour code from the original log file
         rm "${log_filename}.tmp"
-        echo "Cluster $c has been reconciled. Log file: $dir_in/${log_filename}.log."
+        echo "Cluster $c has been reconciled. Log file: ${log_file}."
         if [ "$draw_plot" == true ]
         then
-            echo "Create a pairwise dotplot $cluster_dir/dotplots.png"
+            dotplot="$cluster_dir/cluster_${c}_dotplots.png"
+            echo "Create a pairwise dotplot $dotplot"
             trycycler dotplot --cluster_dir "$cluster_dir"  # Create dotplots.png in the cluster directory
+            mv "$cluster_dir/dotplots.png" "$dotplot"  # To make it easier to pool figures into a single directory
         fi
     done
 else
