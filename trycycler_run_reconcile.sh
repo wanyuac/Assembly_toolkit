@@ -86,9 +86,9 @@ then
         echo "Reconcile contigs in cluster $c"
         if [ ! -z "$s" ]
         then
-            log_filename="cluster_${c}_reconcile_${s}"
+            log_filename="reconcile_cluster_${c}_${s}"  # Filenames do not start from "cluster_${c}" to avoid confusion with the cluster_* glob for the 'trycycler partition' command.
         else
-            log_filename="cluster_${c}_reconcile"
+            log_filename="reconcile_cluster_${c}"
         fi
         cluster_dir="$dir_in/cluster_${c}"
         trycycler reconcile --reads $reads --cluster_dir "$cluster_dir" --threads $t > "${log_filename}.tmp" 2>&1
