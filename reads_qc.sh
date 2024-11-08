@@ -15,6 +15,7 @@ long_reads_min_len=1000
 long_reads_min_qual=10
 long_reads_eval_raw=false
 long_reads_trim=false
+short_reads_eval_raw=false
 
 # Help information ###############
 display_usage() {
@@ -29,13 +30,13 @@ display_usage() {
       --r2=*: fastq or fastq.gz file of paired-end short reads, reverse
       --sample=*: sample name (default: ${sample})
       --outdir=*: output directory, no forward slash (default: ${outdir})
-      --eval_raw: which tasks to perform: raw (only evaluate the quality of raw reads); process
       --long_reads_fastp_mean_qual=*: per-window average quality in long reads for fastp (default: ${long_reads_fastp_mean_qual})
       --long_reads_fastp_window_size=*: size of fastp sliding windows for cutting the heads and tails of long reads (default: ${long_reads_fastp_window_size})
       --long_reads_min_len=*: minimum length of long reads (default: ${long_reads_min_len})
       --long_reads_min_qual=*: minimum average quality of long reads (default: ${long_reads_min_qual})
-      --long_reads_eval_raw: switch on evaluation of raw-read quality
+      --long_reads_eval_raw: switch on the quality evaluation of raw long reads (default: off)
       --long_reads_trim: switch on processing long reads and evaluate the quality of processed reads (default: off)
+      --short_reads_eval_raw: switch on the quality evaluation of raw short reads (default: off)
       --threads=*: number of threads (default: ${threads})
       --memory=*: Memory size in MB (default: ${memory})
     
@@ -46,15 +47,13 @@ display_usage() {
     "
 }
 
-if [ -z $1 ]
-then
+if [ -z $1 ]; then
     display_usage
     exit
 fi
 
 # Read arguments ###############
-for i in "$@"
-do
+for i in "$@"; do
     case $i in
         --r=*)
         long_reads="${i#*=}"  # fastq or fastq.gz file of Nanopore long reads
@@ -89,6 +88,9 @@ do
         --long_reads_trim)
         long_reads_trim=true
         ;;
+        --short_reads_eval_raw)
+        short_reads_eval_raw=true
+        ;;
         --threads=*)
         threads="${i#*=}"  # Number of threads
         ;;
@@ -116,6 +118,8 @@ if [ -f "$long_reads" ]; then
         NanoPlot --fastq $long_reads --outdir "${outdir_raw}/nanoplot" --threads $threads --prefix $sample --title "Unprocessed MinION reads of $sample" --minlength 1 --drop_outliers --readtype 1D --plots kde
         fastqc --outdir $outdir_raw --noextract --format fastq --threads $threads --memory $memory $long_reads
         seqkit stats --all --threads $threads --tabular --basename --seq-type dna $long_reads > "${outdir_raw}/${sample}_seqkit_summary_nanopore_raw.tsv"
+    else
+        echo "[$(date)] Skip quality assessment of long reads."
     fi
 
     # Quality process of reads
@@ -141,16 +145,22 @@ if [ -f "$long_reads" ]; then
         gzip "$nanoq_output"
         rm "$fastp_output"
         echo "[$(date)] Output read file: ${nanoq_output}.gz"
+    else
+        echo "[$(date)] Skip quality process of long reads."
     fi
 fi
 
 # Short-read QC ###############
 if [ -f "$r1" ] && [ -f "$r2" ]; then
     # Assessment of raw-read quality
-    echo "[$(date)] Evaluate the quality of raw reads in $r1 and $r2"
-    output_raw="${outdir}/illumina/raw/quality"
-    mkdir -p "$output_raw"
-    fastqc --outdir "$output_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1 $r2"
+    if $short_reads_eval_raw; then
+        echo "[$(date)] Evaluate the quality of raw reads in $r1 and $r2"
+        output_raw="${outdir}/illumina/raw/quality"
+        mkdir -p "$output_raw"
+        fastqc --outdir "$output_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1 $r2"
+    else
+        echo "[$(date)] Skip quality assessment of raw short reads."
+    fi
 else
     echo "[$(date)] Error: $r1 and/or $r2 were not accessible."
 fi
