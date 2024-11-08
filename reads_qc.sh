@@ -47,6 +47,11 @@ display_usage() {
     "
 }
 
+if [ -z $1 ]; then
+    display_usage
+    exit
+fi
+
 # Other function ###############
 make_dir() {
     if [ ! -d "$1" ]; then
@@ -54,11 +59,6 @@ make_dir() {
         mkdir -p "$1"
     fi
 }
-
-if [ -z $1 ]; then
-    display_usage
-    exit
-fi
 
 # Read arguments ###############
 for i in "$@"; do
