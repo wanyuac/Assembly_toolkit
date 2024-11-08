@@ -47,6 +47,14 @@ display_usage() {
     "
 }
 
+# Other function ###############
+make_dir() {
+    if [ ! -d "$1" ]; then
+        echo "[$(date)] Create directory $1"
+        mkdir -p "$1"
+    fi
+}
+
 if [ -z $1 ]; then
     display_usage
     exit
@@ -103,10 +111,7 @@ for i in "$@"; do
 done
 
 # Main ###############
-if [ ! -d "$outdir" ]; then
-    echo "[$(date)] Create the output directory $outdir"
-    mkdir -p $outdir
-fi
+make_dir "$outdir"
 
 # Long-read QC ###############
 if [ -f "$long_reads" ]; then
@@ -114,7 +119,7 @@ if [ -f "$long_reads" ]; then
     if $long_reads_eval_raw; then  # Using the arithmetic evaluation for the Boolean variable (https://kodekloud.com/blog/declare-bash-boolean-variable-in-shell-script/)
         echo "[$(date)] Inspect the quality of long reads from $long_reads"
         outdir_raw="${outdir}/nanopore/raw/quality"
-        mkdir -p "$outdir_raw"
+        make_dir "$outdir_raw"
         NanoPlot --fastq $long_reads --outdir "${outdir_raw}/nanoplot" --threads $threads --prefix $sample --title "Unprocessed MinION reads of $sample" --minlength 1 --drop_outliers --readtype 1D --plots kde
         fastqc --outdir $outdir_raw --noextract --format fastq --threads $threads --memory $memory $long_reads
         seqkit stats --all --threads $threads --tabular --basename --seq-type dna $long_reads > "${outdir_raw}/${sample}_seqkit_summary_nanopore_raw.tsv"
@@ -126,7 +131,7 @@ if [ -f "$long_reads" ]; then
     if $long_reads_trim; then
         echo "[$(date)] Process long reads from $long_reads for high quality"
         outdir_processed="${outdir}/nanopore/processed"
-        mkdir -p "${outdir_processed}/quality"
+        make_dir "${outdir_processed}/quality"
         quality_suffix="hQ${long_reads_fastp_mean_qual}tQ${long_reads_fastp_mean_qual}w${long_reads_fastp_window_size}L1000"
         fastp_output="${outdir_processed}/${sample}_${quality_suffix}.fastq"
         fastp -i $long_reads -o $fastp_output --html "${outdir_processed}/quality/${sample}_${quality_suffix}_fastp.html" --json /dev/null --thread $threads --cut_front --cut_tail --cut_window_size $long_reads_fastp_window_size --cut_mean_quality $long_reads_fastp_mean_qual --length_required $long_reads_min_len
@@ -156,8 +161,8 @@ if [ -f "$r1" ] && [ -f "$r2" ]; then
     if $short_reads_eval_raw; then
         echo "[$(date)] Evaluate the quality of raw reads in $r1 and $r2"
         output_raw="${outdir}/illumina/raw/quality"
-        mkdir -p "$output_raw"
-        fastqc --outdir "$output_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1 $r2"
+        make_dir "$output_raw"
+        fastqc --outdir "$output_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1" "$r2"
     else
         echo "[$(date)] Skip quality assessment of raw short reads."
     fi
