@@ -2,7 +2,7 @@
 # Quality control of long and short reads before de novo genome assembly.
 # Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 29 0ctober 2024; latest update: 30 0ctober 2024
+# First version: 29 0ctober 2024; latest update: 8 November 2024
 
 # Default parameters ###############
 sample='sample'
@@ -145,8 +145,12 @@ if [ -f "$long_reads" ]; then
 fi
 
 # Short-read QC ###############
-#if [ -f "$r1" ] && [ -f "$r2" ]; then
-#    echo "[$(date)] This functionality will be developed."
-#else
-#    echo "[$(date)] Error: $r1 and/or $r2 were not accessible."
-#fi
+if [ -f "$r1" ] && [ -f "$r2" ]; then
+    # Assessment of raw-read quality
+    echo "[$(date)] Evaluate the quality of raw reads in $r1 and $r2"
+    output_raw="${outdir}/illumina/raw/quality"
+    mkdir -p "$output_raw"
+    fastqc --outdir "$output_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1 $r2"
+else
+    echo "[$(date)] Error: $r1 and/or $r2 were not accessible."
+fi
