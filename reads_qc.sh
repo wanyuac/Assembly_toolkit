@@ -162,7 +162,7 @@ if [ -f "$long_reads" ]; then
         fastqc --outdir "${outdir_processed}/quality" --noextract --format fastq --threads $threads --memory $memory $nanoq_output
         seqkit stats --all --threads $threads --tabular --basename --seq-type dna $nanoq_output > "${outdir_processed}/quality/${output_basename}_seqkit_summary_nanopore.tsv"
         if $rm_fastqc_zip; then
-            rm_file "${outdir_processed}/${output_basename}_fastqc.zip"
+            rm_file "${outdir_processed}/quality/${output_basename}_fastqc.zip"
         fi
 
         # Compress the output file
