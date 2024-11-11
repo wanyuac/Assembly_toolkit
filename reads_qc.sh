@@ -2,7 +2,7 @@
 # Quality control of long and short reads before de novo genome assembly.
 # Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 29 0ctober 2024; latest update: 8 November 2024
+# First version: 29 0ctober 2024; latest update: 11 November 2024
 
 # Default parameters ###############
 sample='sample'
@@ -16,6 +16,7 @@ long_reads_min_qual=10
 long_reads_eval_raw=false
 long_reads_trim=false
 short_reads_eval_raw=false
+rm_fastqc_zip=false
 
 # Help information ###############
 display_usage() {
@@ -38,7 +39,8 @@ display_usage() {
       --long_reads_trim: switch on processing long reads and evaluate the quality of processed reads (default: off)
       --short_reads_eval_raw: switch on the quality evaluation of raw short reads (default: off)
       --threads=*: number of threads (default: ${threads})
-      --memory=*: Memory size in MB (default: ${memory})
+      --memory=*: memory size in MB (default: ${memory})
+      --rm_fastqc_zip: remove Zip files from FastQC's outputs (default: off)
     
     Example useage:
       Assembly_toolkit/reads_qc.sh --r=... --r1=... [other paramters]
@@ -52,11 +54,19 @@ if [ -z $1 ]; then
     exit
 fi
 
-# Other function ###############
+# Other functions ###############
 make_dir() {
     if [ ! -d "$1" ]; then
         echo "[$(date)] Create directory $1"
         mkdir -p "$1"
+    fi
+}
+
+rm_file() {
+    if [ -f "$1" ]; then
+        rm "$1"
+    else
+        echo "Warning: $1 was not found."
     fi
 }
 
@@ -105,6 +115,9 @@ for i in "$@"; do
         --memory=*)
         memory="${i#*=}"  # Memory size in MB
         ;;
+        --rm_fastqc_zip)
+        rm_fastqc_zip=true
+        ;;
         *)  # Do nothing otherwise.
         ;;
     esac
@@ -123,6 +136,9 @@ if [ -f "$long_reads" ]; then
         NanoPlot --fastq $long_reads --outdir "${outdir_raw}/nanoplot" --threads $threads --prefix $sample --title "Unprocessed MinION reads of $sample" --minlength 1 --drop_outliers --readtype 1D --plots kde
         fastqc --outdir $outdir_raw --noextract --format fastq --threads $threads --memory $memory $long_reads
         seqkit stats --all --threads $threads --tabular --basename --seq-type dna $long_reads > "${outdir_raw}/${sample}_seqkit_summary_nanopore_raw.tsv"
+        if $rm_fastqc_zip; then
+            rm_file "${outdir_raw}/${sample}_fastqc.zip"
+        fi
     else
         echo "[$(date)] Skip quality assessment of long reads."
     fi
@@ -163,6 +179,10 @@ if [ -f "$r1" ] && [ -f "$r2" ]; then
         output_raw="${outdir}/illumina/raw/quality"
         make_dir "$output_raw"
         fastqc --outdir "$output_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1" "$r2"
+        if $rm_fastqc_zip; then
+            rm_file "${output_raw}/${sample}_1.fastqc.zip"
+            rm_file "${output_raw}/${sample}_2.fastqc.zip"
+        fi
     else
         echo "[$(date)] Skip quality assessment of raw short reads."
     fi
