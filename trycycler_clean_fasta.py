@@ -12,12 +12,13 @@ The exclusion table is a header-less TSV file of two columns: (1) name of each I
 
 Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-First edition: 2 November 2024; latest update: 2 November 2024
+First edition: 2 November 2024; latest update: 11 November 2024
 """
 
 import os
 import shutil
 import argparse
+from modules.utilities import check_dir
 
 def parse_arguments():  # https://stackoverflow.com/questions/7066826/in-python-how-to-get-subparsers-to-read-in-parent-parsers-argument
     parser = argparse.ArgumentParser(description = "Remove contigs from FASTA files by contig names")
@@ -48,13 +49,6 @@ def main():
     for fasta_filename, contig_names in excl_tab.items():
         filter_fasta(fasta_filename, contig_names, input_dir, org_dir, rm_dir)
 
-    return
-
-
-def check_dir(d):
-    if not os.path.exists(d):
-        print(f"Create directory {d}")
-        os.makedirs(d)
     return
 
 
