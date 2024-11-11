@@ -191,6 +191,4 @@ if [ -f "$r1" ] && [ -f "$r2" ]; then
     else
         echo "[$(date)] Skip quality assessment of raw short reads."
     fi
-else
-    echo "[$(date)] Error: $r1 and/or $r2 were not accessible."
 fi
