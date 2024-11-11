@@ -152,14 +152,18 @@ if [ -f "$long_reads" ]; then
         fastp_output="${outdir_processed}/${sample}_${quality_suffix}.fastq"
         fastp -i $long_reads -o $fastp_output --html "${outdir_processed}/quality/${sample}_${quality_suffix}_fastp.html" --json /dev/null --thread $threads --cut_front --cut_tail --cut_window_size $long_reads_fastp_window_size --cut_mean_quality $long_reads_fastp_mean_qual --length_required $long_reads_min_len
         quality_suffix="${quality_suffix}_aQ${long_reads_min_qual}"
-        nanoq_output="${outdir_processed}/${sample}_${quality_suffix}.fastq"
-        nanoq --input $fastp_output --output-type u --output $nanoq_output --min-qual $long_reads_min_qual --report "${outdir_processed}/quality/${sample}_${quality_suffix}_nanoq_summary.txt"
+        output_basename="${sample}_${quality_suffix}"
+        nanoq_output="${outdir_processed}/${output_basename}.fastq"
+        nanoq --input $fastp_output --output-type u --output $nanoq_output --min-qual $long_reads_min_qual --report "${outdir_processed}/quality/${output_basename}_nanoq_summary.txt"
         
         # Evaluate the quality of processed reads
         echo "[$(date)] Inspect the quality of processed long reads from $nanoq_output"
         NanoPlot --fastq $nanoq_output --outdir "${outdir_processed}/quality/nanoplot" --threads $threads --prefix $sample --title "Processed MinION reads of $sample (${quality_suffix})" --minlength 1 --drop_outliers --readtype 1D --plots kde
         fastqc --outdir "${outdir_processed}/quality" --noextract --format fastq --threads $threads --memory $memory $nanoq_output
-        seqkit stats --all --threads $threads --tabular --basename --seq-type dna $nanoq_output > "${outdir_processed}/quality/${sample}_seqkit_summary_nanopore_${quality_suffix}.tsv"
+        seqkit stats --all --threads $threads --tabular --basename --seq-type dna $nanoq_output > "${outdir_processed}/quality/${output_basename}_seqkit_summary_nanopore.tsv"
+        if $rm_fastqc_zip; then
+            rm_file "${outdir_processed}/${output_basename}_fastqc.zip"
+        fi
 
         # Compress the output file
         echo "[$(date)] Compress $nanoq_output and remove the intermediate file $fastp_output"
