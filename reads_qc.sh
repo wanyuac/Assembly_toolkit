@@ -131,7 +131,7 @@ if [ -f "$long_reads" ]; then
     # Evaluate the quality of raw reads
     if $long_reads_eval_raw; then  # Using the arithmetic evaluation for the Boolean variable (https://kodekloud.com/blog/declare-bash-boolean-variable-in-shell-script/)
         echo "[$(date)] Inspect the quality of long reads from $long_reads"
-        outdir_raw="${outdir}/nanopore/raw/quality"
+        outdir_raw="${outdir}/nanopore/1_raw/quality"
         make_dir "$outdir_raw"
         NanoPlot --fastq $long_reads --outdir "${outdir_raw}/nanoplot" --threads $threads --prefix $sample --title "Unprocessed MinION reads of $sample" --minlength 1 --drop_outliers --readtype 1D --plots kde
         fastqc --outdir $outdir_raw --noextract --format fastq --threads $threads --memory $memory $long_reads
@@ -146,7 +146,7 @@ if [ -f "$long_reads" ]; then
     # Quality process of reads
     if $long_reads_trim; then
         echo "[$(date)] Process long reads from $long_reads for high quality"
-        outdir_processed="${outdir}/nanopore/processed"
+        outdir_processed="${outdir}/nanopore/2_processed"
         make_dir "${outdir_processed}/quality"
         quality_suffix="hQ${long_reads_fastp_mean_qual}tQ${long_reads_fastp_mean_qual}w${long_reads_fastp_window_size}L1000"
         fastp_output="${outdir_processed}/${sample}_${quality_suffix}.fastq"
@@ -180,7 +180,7 @@ if [ -f "$r1" ] && [ -f "$r2" ]; then
     # Assessment of raw-read quality
     if $short_reads_eval_raw; then
         echo "[$(date)] Evaluate the quality of raw reads in $r1 and $r2"
-        outdir_raw="${outdir}/illumina/raw/quality"
+        outdir_raw="${outdir}/illumina/1_raw/quality"
         make_dir "$outdir_raw"
         fastqc --outdir "$outdir_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1" "$r2"
         seqkit stats --all --threads $threads --tabular --basename --seq-type dna "$r1" "$r2" > "${outdir_raw}/${sample}_seqkit_summary_illumina_raw.tsv"
