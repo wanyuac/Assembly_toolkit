@@ -176,13 +176,13 @@ if [ -f "$r1" ] && [ -f "$r2" ]; then
     # Assessment of raw-read quality
     if $short_reads_eval_raw; then
         echo "[$(date)] Evaluate the quality of raw reads in $r1 and $r2"
-        output_raw="${outdir}/illumina/raw/quality"
-        make_dir "$output_raw"
-        fastqc --outdir "$output_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1" "$r2"
+        outdir_raw="${outdir}/illumina/raw/quality"
+        make_dir "$outdir_raw"
+        fastqc --outdir "$outdir_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1" "$r2"
         seqkit stats --all --threads $threads --tabular --basename --seq-type dna "$r1" "$r2" > "${outdir_raw}/${sample}_seqkit_summary_illumina_raw.tsv"
         if $rm_fastqc_zip; then
-            rm_file "${output_raw}/${sample}_1.fastqc.zip"
-            rm_file "${output_raw}/${sample}_2.fastqc.zip"
+            rm_file "${outdir_raw}/${sample}_1.fastqc.zip"
+            rm_file "${outdir_raw}/${sample}_2.fastqc.zip"
         fi
     else
         echo "[$(date)] Skip quality assessment of raw short reads."
