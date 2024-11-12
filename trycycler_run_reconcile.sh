@@ -17,7 +17,7 @@ display_usage() {
       -p: Generate a pairwise dot plot for contigs in each cluster
     
     Example useage:
-      /usr/local/bin/Assembly_toolkit/trycycler_run_reconcile.sh -i=2_clusters -n=3 -s=round1 -t=16 -p
+      ~/bin/Assembly_toolkit/trycycler_run_reconcile.sh -i=2_clusters -n=3 -s=r1 -t=16 -p
 
     Dependencies: trycycler, perl.
     "
@@ -67,7 +67,7 @@ done
 # Determine the number of clusters
 if [ -d "$dir_in" ]
 then
-    n=$(ls -d -1 $dir_in/cluster_* | wc -l)
+    n=$(ls -d -1 $dir_in/cluster_*/ | wc -l)
 else
     echo "Error: input directory $dir_in was not found. Exit"
     exit 1
