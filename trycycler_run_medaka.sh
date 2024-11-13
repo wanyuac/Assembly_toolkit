@@ -2,7 +2,7 @@
 # This script Trycycler consensus sequences using Medaka.
 # Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 7 November 2024; last update: 12 November 2024
+# First version: 7 November 2024; last update: 13 November 2024
 
 # Help information ###############
 display_usage() {
@@ -74,7 +74,7 @@ fi
 
 if [ $t -lt 1 ]
 then
-    echo "Parameter error: the number of threads is negative. Reset to 1."
+    echo "Parameter error: the number of threads is negative. Reset it to 1."
     t=1
 fi
 
