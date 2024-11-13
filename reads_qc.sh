@@ -2,7 +2,7 @@
 # Quality control of long and short reads before de novo genome assembly.
 # Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 29 0ctober 2024; latest update: 11 November 2024
+# First version: 29 0ctober 2024; latest update: 13 November 2024
 
 # Default parameters ###############
 sample='sample'
@@ -185,8 +185,8 @@ if [ -f "$r1" ] && [ -f "$r2" ]; then
         fastqc --outdir "$outdir_raw" --noextract --nogroup --format fastq --threads "$threads" "$r1" "$r2"
         seqkit stats --all --threads $threads --tabular --basename --seq-type dna "$r1" "$r2" > "${outdir_raw}/${sample}_seqkit_summary_illumina_raw.tsv"
         if $rm_fastqc_zip; then
-            rm_file "${outdir_raw}/${sample}_1.fastqc.zip"
-            rm_file "${outdir_raw}/${sample}_2.fastqc.zip"
+            rm_file "${outdir_raw}/${sample}_1_fastqc.zip"
+            rm_file "${outdir_raw}/${sample}_2_fastqc.zip"
         fi
     else
         echo "[$(date)] Skip quality assessment of raw short reads."
