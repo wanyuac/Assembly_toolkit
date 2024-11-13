@@ -15,7 +15,7 @@ display_usage() {
       -t=*: Number of threads (default: 1)
     
     Example useage:
-      ~/bin/Assembly_toolkit/trycycler_generate_consensus.sh -r=sample1.fastq.gz -d=2_clusters -t=16 >trycycler_generate_consensus.log 2>&1
+      ~/bin/Assembly_toolkit/trycycler_consensus.sh -r=sample1.fastq.gz -d=2_clusters -t=16 >trycycler_consensus.log 2>&1
 
     Dependencies: trycycler, perl.
     "

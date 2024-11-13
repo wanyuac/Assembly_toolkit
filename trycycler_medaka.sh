@@ -17,7 +17,7 @@ display_usage() {
       -t=*: Number of threads (default: 1)
     
     Example useage:
-      ~/bin/Assembly_toolkit/trycycler_run_medaka.sh -d=2_clusters -m=r941_min_hac_g507 -s=isolate1 -o=3_polish -t=16 > trycycler_run_medaka.log
+      ~/bin/Assembly_toolkit/trycycler_medaka.sh -d=2_clusters -m=r941_min_hac_g507 -s=isolate1 -o=3_polish -t=16 > trycycler_medaka.log
 
     Dependency: medaka (medaka_consensus)
     "

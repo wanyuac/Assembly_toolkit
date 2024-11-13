@@ -17,7 +17,7 @@ display_usage() {
       -p: Generate a pairwise dot plot for contigs in each cluster
     
     Example useage:
-      ~/bin/Assembly_toolkit/trycycler_run_reconcile.sh -i=2_clusters -n=3 -s=r1 -t=16 -p
+      ~/bin/Assembly_toolkit/trycycler_reconcile.sh -i=2_clusters -n=3 -s=r1 -t=16 -p
 
     Dependencies: trycycler, perl.
     "

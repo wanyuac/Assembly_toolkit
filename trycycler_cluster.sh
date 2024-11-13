@@ -17,7 +17,7 @@ display_usage() {
       -t=*: Number of threads (default: 1)
     
     Example useage:
-      ~/bin/Assembly_toolkit/trycycler_exclude_bad_contigs.sh -i=1_assemblies_min25x -r=reads/sample1.fastq.gz -s=min25x_r1 -t=8
+      ~/bin/Assembly_toolkit/trycycler_cluster.sh -i=1_assemblies_min25x -r=reads/sample1.fastq.gz -s=min25x_r1 -t=8
 
     Dependency: trycycler
     "
