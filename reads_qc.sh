@@ -2,7 +2,7 @@
 # Quality control of long and short reads before de novo genome assembly.
 # Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 29 0ctober 2024; latest update: 13 November 2024
+# First version: 29 0ctober 2024; latest update: 15 November 2024
 
 # Default parameters ###############
 sample='sample'
@@ -143,7 +143,7 @@ if [ -f "$long_reads" ]; then
         echo "[$(date)] Skip quality assessment of long reads."
     fi
 
-    # Quality process of reads
+    # Quality process of reads and quality report
     if $long_reads_trim; then
         echo "[$(date)] Process long reads from $long_reads for high quality"
         outdir_processed="${outdir}/nanopore/2_processed"
@@ -158,7 +158,7 @@ if [ -f "$long_reads" ]; then
         
         # Evaluate the quality of processed reads
         echo "[$(date)] Inspect the quality of processed long reads from $nanoq_output"
-        NanoPlot --fastq $nanoq_output --outdir "${outdir_processed}/quality/nanoplot" --threads $threads --prefix $sample --title "Processed MinION reads of $sample (${quality_suffix})" --minlength 1 --drop_outliers --readtype 1D --plots kde
+        NanoPlot --fastq $nanoq_output --outdir "${outdir_processed}/quality/nanoplot" --threads $threads --prefix $output_basename --title "Processed MinION reads of $sample (${quality_suffix})" --minlength 1 --drop_outliers --readtype 1D --plots kde
         fastqc --outdir "${outdir_processed}/quality" --noextract --format fastq --threads $threads --memory $memory $nanoq_output
         seqkit stats --all --threads $threads --tabular --basename --seq-type dna $nanoq_output > "${outdir_processed}/quality/${output_basename}_seqkit_summary_nanopore.tsv"
         if $rm_fastqc_zip; then
