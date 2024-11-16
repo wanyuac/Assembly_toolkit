@@ -5,7 +5,7 @@ Modules for package Assembly_toolkit.
 
 Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Publication: 20 February 2024; the latest update: 20 February 2024.
+Publication: 20 February 2024; the latest update: 11 November 2024.
 """
 
 import os
@@ -26,7 +26,7 @@ def check_dir(p):
         print(f"Directory {p} exists." )
     elif not os.path.isfile(p):
         print("Create directory " + p)
-        os.path.mkdir(p)
+        os.makedirs(p)
     else:
         print(f"Error: {p} exists as a file, so no directory could be created with this path.", file = sys.stderr)
         sys.exit(1)

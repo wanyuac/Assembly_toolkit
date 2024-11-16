@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Creating a dot plot from each sequence in a multi-FASTA file.
 
@@ -8,7 +9,7 @@ Dependencies: Python v3, BioPython, PIL (pip install Pillow)
 
 Copyright (C) 2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Creation: 28 September 2022; the latest update: 20 July 2024
+Creation: 28 September 2022; the latest update: 8 November 2024
 
 Appendix: Copyright information of Ryan Wick's dotplot.py
 'Copyright 2020 Ryan Wick (rrwick@gmail.com)
