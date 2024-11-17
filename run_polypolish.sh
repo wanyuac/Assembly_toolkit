@@ -11,7 +11,7 @@
 SCRIPT_VERSION=2.0
 i='isolate'
 n="$i"
-outdir=polypolish_output
+outdir='polypolish_output'
 t=1
 
 # Function definitions ###############
