@@ -2,7 +2,7 @@
 # This script Trycycler consensus sequences using Medaka.
 # Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 7 November 2024; last update: 13 November 2024
+# First version: 7 November 2024; last update: 17 November 2024
 
 # Help information ###############
 display_usage() {
@@ -118,8 +118,8 @@ then
     echo "[$(date)] Create the output directory $polish_dir"
     mkdir -p "$polish_dir"
 fi
+mv $medaka_log $polish_dir
 
 echo "[$(date)] Concatenate consensus sequences and save them in subdirectory $polish_dir"
-
 cat "$parental_dir"/cluster_*/7_final_consensus.fasta > "$polish_dir/1_${sample_name}_trycycler_consensus_raw.fasta"  # Unpolished
 cat "$parental_dir"/cluster_*/8_medaka.fasta > "$polish_dir/2_${sample_name}_trycycler_consensus_medaka.fasta"  # Medaka-polished
