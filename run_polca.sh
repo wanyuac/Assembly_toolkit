@@ -1,9 +1,14 @@
 #!/bin/bash
 # Copyright (C) 2022-2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 17 Dec 2023
+# First version: 1 May 2022; latest update: 17 November 2024
 
-SCRIPT_VERSION=1.1.0
+# Set default values ###############
+SCRIPT_VERSION=2.0
+i='isolate'
+n="$i"
+outdir='polca_output'
+t=1
 
 # Function definitions ###############
 # Run './run_polca.sh' to display the information below.
@@ -19,16 +24,17 @@ display_parameters() {
       -a=*: absolute path and filename of the input assembly in FASTA format (mandatory)
       -r=*: path to the directory of paired-end short reads (without the end forward
             slash), where read files' names follow format [sample name]_[1,2].fastq.gz (mandatory)
-      -i=*: isolate name (default: isolate)
-      -n=*: prefix of output filenames (default: isolate)
-      -o=*: path to output directory (default: polca_output)
+      -i=*: isolate name (default: ${i})
+      -s=*: suffix of input FASTQ filename: [isolate name]_[suffix]_[1,2].fastq.gz (default: none)
+      -n=*: prefix of output filenames (default: ${n})
+      -o=*: path to output directory (default: ${outdir})
       -p=*: MaSuRCA/bin directory (without the end forward slash), where polca.sh is
             stored (mandatory)
-      -t=*: number of threads (default: 2)
+      -t=*: number of threads (default: ${t})
     
     Example command:
-      /usr/local/bin/Assembly_toolkit/run_polca.sh -a=\$PWD/1_isolate1_polypolish.fasta -r=reads/illumina \\
-        -i=isolate1 -n=3_isolate1 -o="\$PWD" -p=\$HOME/bin/MaSuRCA-4.0.5/bin -t=8 > 3_isolate1_polca.log
+      ~/bin/Assembly_toolkit/run_polca.sh -a=\$PWD/1_isolate1_polypolish.fasta -r=reads/illumina \\
+      -i=isolate1 -n=3_isolate1 -o="\$PWD" -p=\$HOME/bin/MaSuRCA-4.0.5/bin -t=8 > 3_isolate1_polca.log
     
     Output: a polished assembly [o]/[n]_polca.fna in FASTA format
     "
@@ -44,12 +50,6 @@ then
     exit
 fi
 
-# Set default values ###############
-i=isolate
-n="$i"
-outdir=polca_output
-t=2
-
 # Read parameters ###############
 for arg in "$@"
 do
@@ -62,6 +62,9 @@ do
         ;;
         -i=*)
         i="${arg#*=}"
+        ;;
+        -s=*)
+        s="${arg#*=}"
         ;;
         -n=*)
         n="${arg#*=}"
@@ -99,8 +102,14 @@ fi
 
 if [ -d "$read_dir" ]
 then
-    r1=${read_dir}/${i}_1.fastq.gz
-    r2=${read_dir}/${i}_2.fastq.gz
+    if [ -z "$s" ]
+    then
+        r1=${read_dir}/${i}_1.fastq.gz
+        r2=${read_dir}/${i}_2.fastq.gz
+    else
+        r1="${read_dir}/${i}_${s}_1.fastq.gz"
+        r2="${read_dir}/${i}_${s}_2.fastq.gz"
+    fi
     if [ ! -f "$r1" ] || [ ! -f "$r2" ]  # '-f' works for symbolic links
     then
         echo "Error: read file $r1 and/or $r2 were not found."
@@ -127,7 +136,7 @@ then
         tm="polca_tmp_$i"
         mkdir $tm  # Create a temporary directory in the current working directory
         cd $tm
-        echo "$(date): Start to polish $fasta_in of isolates $i with reads $r1 and $r2 and with $t threads"
+        echo "[$(date)] Start to polish $fasta_in of isolates $i with reads $r1 and $r2 and with $t threads"
         $polca -a $fasta_in -r "$r1 $r2" -t "$t" -m 8G
         polca_out="${fasta_name}.PolcaCorrected.fa"
         fasta_out="${outdir}/${n}_polca.fna"
@@ -138,7 +147,7 @@ then
             mv "$tm/$polca_out" "$fasta_out"  # Output FASTA file and its name
             rm -r $tm  # Delete the temporary directory and its content
             rm "$fasta_in".fai
-            echo "Success: polished assembly of isolate $i was saved as ${fasta_out}."
+            echo "[$(date)] Success: polished assembly of isolate $i was saved as ${fasta_out}."
         else
             echo "Error: output file $polca_out was not found. Please check files in $tm for details."
             print_failure_message "$i"

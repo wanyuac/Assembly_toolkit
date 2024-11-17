@@ -238,7 +238,7 @@ if [ -f "$r1" ] && [ -f "$r2" ]; then
         fastp --in1 $r1 --in2 $r2 --out1 $fastp_output1 --out2 $fastp_output2 --html "${outdir_processed}/quality/${output_basename}_fastp.html" \
         --json /dev/null --thread $threads --cut_front --cut_tail --cut_window_size $short_reads_fastp_window_size --cut_mean_quality $short_reads_fastp_mean_qual \
         --average_qual $short_reads_min_qual --length_required $short_reads_min_len
-        fastqc --outdir "${outdir_processed}/quality" --noextract --format fastq --threads $threads --memory $memory $fastp_output1 $fastp_output2
+        fastqc --outdir "${outdir_processed}/quality" --noextract --nogroup --format fastq --threads $threads --memory $memory $fastp_output1 $fastp_output2
         seqkit stats --all --threads $threads --tabular --basename --seq-type dna $fastp_output1 $fastp_output2 > "${outdir_processed}/quality/${output_basename}_seqkit_stats_illumina.tsv"
         if $rm_fastqc_zip; then
             rm_file "${outdir_processed}/quality/${output_basename}_1_fastqc.zip"

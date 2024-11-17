@@ -1,13 +1,20 @@
 #!/bin/bash
+# This script has been adapted from run_polypolish_legacy.sh for Polypolish v0.6.0 and onwards.
+# It is not compatible with Polypolish v0.5.0, for which run_polypolish_legacy.sh should be used.
+# Update note of v0.6.0: https://github.com/rrwick/Polypolish/releases/tag/v0.6.0.
 # Reference: https://github.com/rrwick/Polypolish/wiki/How-to-run-Polypolish
-# Copyright (C) 2022-2023 Yu Wan <wanyuac@126.com>
+# Copyright (C) 2022-2024 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 17 Dec 2023
+# First version: 1 May 2022; latest update: 17 November 2024
 
-SCRIPT_VERSION=1.0.0
+# Set default values ###############
+SCRIPT_VERSION=2.0
+i='isolate'
+n="$i"
+outdir='polypolish_output'
+t=1
 
 # Function definitions ###############
-# Run './run_polypolish.sh' to display the information below.
 display_parameters() {
     echo "
     run_polypolish.sh v$SCRIPT_VERSION
@@ -20,14 +27,14 @@ display_parameters() {
       -a=*: path and filename of the input assembly in FASTA format (mandatory)
       -r=*: path to the directory of paired-end short reads (without the end forward
             slash), where read files' names follow format [isolate name]_[1,2].fastq.gz (mandatory)
-      -i=*: isolate name (default: isolate)
-      -n=*: prefix of output filenames (default: isolate)
-      -o=*: path to output directory (default: polypolish_output)
-      -t=*: number of threads (default: 2)
+      -i=*: isolate name (default: ${i})
+      -s=*: suffix of input FASTQ filename: [isolate name]_[suffix]_[1,2].fastq.gz (default: none)
+      -n=*: prefix of output filenames (default: ${n})
+      -o=*: path to output directory (default: ${outdir})
+      -t=*: number of threads (default: ${t})
     
     Example command:
-      /usr/local/bin/Assembly_toolkit/run_polypolish.sh -a=1_isolate1_medaka.fasta -r=reads/illumina \\
-        -i=isolate1 -n="2_isolate1" -o="\$PWD" -t=8
+      ~/bin/Assembly_toolkit/run_polypolish.sh -a=1_isolate1_medaka.fasta -r=reads/illumina -i=isolate1 -n="2_isolate1" -o="\$PWD" -t=8
     
     Outputs:
       1. a polished assembly [o]/[n]_polypolish.fna in FASTA format
@@ -45,12 +52,6 @@ then
     exit
 fi
 
-# Set default values ###############
-i=isolate
-n="$i"
-outdir=polypolish_output
-t=2
-
 # Read parameters ###############
 for arg in "$@"
 do
@@ -63,6 +64,9 @@ do
         ;;
         -i=*)
         i="${arg#*=}"
+        ;;
+        -s=*)
+        s="${arg#*=}"
         ;;
         -n=*)
         n="${arg#*=}"
@@ -88,8 +92,14 @@ fi
 
 if [ -d "$read_dir" ]
 then
-    r1="${read_dir}/${i}_1.fastq.gz"
-    r2="${read_dir}/${i}_2.fastq.gz"
+    if [ -z "$s" ]
+    then
+        r1="${read_dir}/${i}_1.fastq.gz"
+        r2="${read_dir}/${i}_2.fastq.gz"
+    else
+        r1="${read_dir}/${i}_${s}_1.fastq.gz"
+        r2="${read_dir}/${i}_${s}_2.fastq.gz"
+    fi
     if [ ! -e "$r1" ] || [ ! -e "$r2" ]  # $r1 and $r2 can be files or symbolic links
     then
         echo "Error: read file $r1 and/or $r2 were not found."
@@ -109,29 +119,26 @@ then
     # Set up output directories and filenames
     if [ ! -d "$outdir" ]
     then
-        echo "Create output directory $outdir"
+        echo "Create output directory $outdir" >> "${output_prefix}.txt"
         mkdir "$outdir"
     fi
-    echo "Start to polish $fasta_in of isolate $i with reads from $read_dir and save outputs in ${outdir}/"
+    echo "[$(date)] Start to polish $fasta_in of isolate $i with reads from $read_dir and save outputs in ${outdir}/" >> "${output_prefix}.txt"
+    echo "Read files: $r1 $r2" >> "${output_prefix}.txt"
 
     # Filtering read alignments to exclude those of unusually large insert sizes ###############
-    echo "$(date): Creating SAM files for isolate $i" >> "${output_prefix}.txt"
+    echo "[$(date)] Creating SAM files for isolate $i" >> "${output_prefix}.txt"
     tm="sams_$i"
     mkdir $tm
     bwa index $fasta_in
     bwa mem -a -t $t $fasta_in $r1 > ${tm}/unfiltered_1.sam
     bwa mem -a -t $t $fasta_in $r2 > ${tm}/unfiltered_2.sam
-    polypolish_insert_filter.py --in1 ${tm}/unfiltered_1.sam --in2 ${tm}/unfiltered_2.sam --out1 ${tm}/filtered_1.sam --out2 ${tm}/filtered_2.sam 1>> "${output_prefix}.txt" 2>&1
+    polypolish filter --in1 ${tm}/unfiltered_1.sam --in2 ${tm}/unfiltered_2.sam --out1 ${tm}/filtered_1.sam --out2 ${tm}/filtered_2.sam 1>> "${output_prefix}.txt" 2>&1
 
     # Polish the input assembly ###############
-    echo "$(date): Polishing assembly $fasta_in with Polypolish" >> "${output_prefix}.txt"
-    polypolish $fasta_in ${tm}/filtered_1.sam ${tm}/filtered_2.sam 1>"${output_prefix}.fna" 2>>"${output_prefix}.txt"
-    echo "$(date): Finished polishing $fasta_in" >> "${output_prefix}.txt"
+    echo "[$(date)] Polishing assembly $fasta_in with Polypolish" >> "${output_prefix}.txt"
+    polypolish polish $fasta_in ${tm}/filtered_1.sam ${tm}/filtered_2.sam 1>"${output_prefix}.fna" 2>>"${output_prefix}.txt"
+    echo "[$(date)] Finished polishing $fasta_in" >> "${output_prefix}.txt"
     rm -rf $tm
-
-    # Remove '_polypolish' from sequence headers to preserve the original ones ###############
-    echo "$(date): processing the polished assembly and log files" >>"${output_prefix}.txt"
-    sed -i 's/_polypolish//g' ${output_prefix}.fna
 
     # Remove non-character content from log files ###############
     perl -p -e 's/\x1b\[[0-9;]*[mG]//g' ${output_prefix}.txt > ${output_prefix}.log
@@ -139,5 +146,5 @@ then
 
     # Clean up ###############
     rm "$fasta_in".*
-    echo "This Polypolish job successfully finished. Results have been saved in ${outdir}."
+    echo "This Polypolish job successfully finished. Results have been saved in ${outdir}." >> ${output_prefix}.log
 fi

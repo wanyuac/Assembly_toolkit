@@ -1,18 +1,18 @@
 #!/bin/bash
-# This script has been adapted from run_polypolish.sh for Polypolish v0.6.0 and onwards. It is not compatible with
-# Polypolish v0.5.0. Update note of v0.6.0: https://github.com/rrwick/Polypolish/releases/tag/v0.6.0.
+# This script was called run_polypolish.sh and was only compatible with Polypolish v0.5.0 and
+# earlier versions.
 # Reference: https://github.com/rrwick/Polypolish/wiki/How-to-run-Polypolish
-# Copyright (C) 2022-2024 Yu Wan <wanyuac@126.com>
+# Copyright (C) 2022-2023 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 1 May 2022; latest update: 25 Feb 2024
+# First version: 1 May 2022; latest update: 17 November 2024
 
-SCRIPT_VERSION=1.1.0
+SCRIPT_VERSION=1.0.0
 
 # Function definitions ###############
-# Run './run_polypolish.sh' to display the information below.
+# Run './run_polypolish_legacy.sh' to display the information below.
 display_parameters() {
     echo "
-    run_polypolish_plus.sh v$SCRIPT_VERSION
+    run_polypolish.sh v$SCRIPT_VERSION
 
     This script polishes an input genome assembly with Polypolish and paired-end short reads.
 
@@ -28,7 +28,7 @@ display_parameters() {
       -t=*: number of threads (default: 2)
     
     Example command:
-      /usr/local/bin/Assembly_toolkit/run_polypolish_plus.sh -a=1_isolate1_medaka.fasta -r=reads/illumina \\
+      /usr/local/bin/Assembly_toolkit/run_polypolish_legacy.sh -a=1_isolate1_medaka.fasta -r=reads/illumina \\
         -i=isolate1 -n="2_isolate1" -o="\$PWD" -t=8
     
     Outputs:
@@ -106,7 +106,7 @@ fi
 if [ -f "$fasta_in" ]
 then
     output_prefix="${outdir}/${n}_polypolish"
-    echo "run_polypolish_plus.sh v$SCRIPT_VERSION" > "${output_prefix}.txt"
+    echo "run_polypolish.sh v$SCRIPT_VERSION" > "${output_prefix}.txt"
 
     # Set up output directories and filenames
     if [ ! -d "$outdir" ]
@@ -123,13 +123,17 @@ then
     bwa index $fasta_in
     bwa mem -a -t $t $fasta_in $r1 > ${tm}/unfiltered_1.sam
     bwa mem -a -t $t $fasta_in $r2 > ${tm}/unfiltered_2.sam
-    polypolish filter --in1 ${tm}/unfiltered_1.sam --in2 ${tm}/unfiltered_2.sam --out1 ${tm}/filtered_1.sam --out2 ${tm}/filtered_2.sam 1>> "${output_prefix}.txt" 2>&1
+    polypolish_insert_filter.py --in1 ${tm}/unfiltered_1.sam --in2 ${tm}/unfiltered_2.sam --out1 ${tm}/filtered_1.sam --out2 ${tm}/filtered_2.sam 1>> "${output_prefix}.txt" 2>&1
 
     # Polish the input assembly ###############
     echo "$(date): Polishing assembly $fasta_in with Polypolish" >> "${output_prefix}.txt"
-    polypolish polish $fasta_in ${tm}/filtered_1.sam ${tm}/filtered_2.sam 1>"${output_prefix}.fna" 2>>"${output_prefix}.txt"
+    polypolish $fasta_in ${tm}/filtered_1.sam ${tm}/filtered_2.sam 1>"${output_prefix}.fna" 2>>"${output_prefix}.txt"
     echo "$(date): Finished polishing $fasta_in" >> "${output_prefix}.txt"
     rm -rf $tm
+
+    # Remove '_polypolish' from sequence headers to preserve the original ones ###############
+    echo "$(date): processing the polished assembly and log files" >>"${output_prefix}.txt"
+    sed -i 's/_polypolish//g' ${output_prefix}.fna
 
     # Remove non-character content from log files ###############
     perl -p -e 's/\x1b\[[0-9;]*[mG]//g' ${output_prefix}.txt > ${output_prefix}.log
