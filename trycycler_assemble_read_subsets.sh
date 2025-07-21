@@ -2,7 +2,7 @@
 # Run Flye, Raven, and Minipolish assembler to assemble subsets of Nanopore reads generated using command "trycycler subsample".
 # Copyright (C) 2023-2024 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# First version: 27 July 2023; last update: 31 October 2024
+# First version: 27 July 2023; last update: 21 July 2025
 
 # Default value ###############
 output_dir='1_assemblies'  # Default output directory
@@ -157,7 +157,7 @@ then
     exit
 fi
 
-if [ -z "genome_len" ]
+if [ -z "$genome_len" ]
 then
     echo "[$(date)] Error: expected genome length was not specified for Raven."
     exit
