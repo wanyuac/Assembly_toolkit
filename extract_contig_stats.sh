@@ -7,7 +7,7 @@
 #
 # Copyright (C) 2024-2025 Yu Wan <wanyuac@gmail.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# Publication: 7 June 2024; latest update: 12 July 2025
+# Publication: 7 June 2024; latest update: 13 August 2025
 
 shovill_mode=true
 assemblies_glob=""
@@ -83,5 +83,5 @@ else
 fi
 
 # Concatenate all individual TSVs into one file with a single header
-echo -e "Isolate\tContig\tLength\tDepth" > all_contig_stats.tsv
-cat *__contig_stats.tsv >> all_contig_stats.tsv
+#echo -e "Isolate\tContig\tLength\tDepth" > all_contig_stats.tsv
+#cat *__contig_stats.tsv >> all_contig_stats.tsv
