@@ -7,9 +7,14 @@ Usage:
     python estimate_read_depths.py --help
     python estimate_read_depths.py {illuminaPE, nanopore} {--help or parameters}
 
+Dependencies:
+    mosdepth (https://github.com/brentp/mosdepth)
+    minimap2 (https://github.com/lh3/minimap2)
+    samtools (https://github.com/samtools/samtools)
+
 Copyright (C) 2024 Yu Wan <wanyuac@gmail.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Publication: 26 Oct 2024; the latest update: 27 Oct 2024.
+Publication: 26 Oct 2024; the latest update: 6 Sep 2025.
 """
 
 import os
